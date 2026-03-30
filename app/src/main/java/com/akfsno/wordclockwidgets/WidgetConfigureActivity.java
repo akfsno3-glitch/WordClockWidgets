@@ -15,8 +15,8 @@ import android.widget.Spinner;
 public class WidgetConfigureActivity extends Activity {
 
     private int appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private Spinner styleSpinner, colorSpinner, fontSpinner, borderColorSpinner, backgroundColorSpinner;
-    private SeekBar fontSizeSeekBar, lineSpacingSeekBar, borderWidthSeekBar, backgroundAlphaSeekBar;
+    private Spinner styleSpinner, colorSpinner, borderColorSpinner, backgroundColorSpinner;
+    private SeekBar fontSizeSeekBar, borderWidthSeekBar, backgroundAlphaSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +49,6 @@ public class WidgetConfigureActivity extends Activity {
         colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         colorSpinner.setAdapter(colorAdapter);
 
-        fontSpinner = findViewById(R.id.font_spinner);
-        ArrayAdapter<String> fontAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
-                new String[]{"Обычный", "Жирный", "Курсив", "Моноширинный", "Санс-сериф"});
-        fontAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        fontSpinner.setAdapter(fontAdapter);
-
         borderColorSpinner = findViewById(R.id.border_color_spinner);
         borderColorSpinner.setAdapter(colorAdapter);
 
@@ -63,9 +57,6 @@ public class WidgetConfigureActivity extends Activity {
 
         fontSizeSeekBar = findViewById(R.id.font_size_seekbar);
         fontSizeSeekBar.setProgress((int) WidgetPreferences.getFontSize(this, appWidgetId, 24f));
-
-        lineSpacingSeekBar = findViewById(R.id.line_spacing_seekbar);
-        lineSpacingSeekBar.setProgress((int) (WidgetPreferences.getLineSpacing(this, appWidgetId, 1.0f) * 100));
 
         borderWidthSeekBar = findViewById(R.id.border_width_seekbar);
         borderWidthSeekBar.setProgress(WidgetPreferences.getBorderWidth(this, appWidgetId, 2));
@@ -91,12 +82,6 @@ public class WidgetConfigureActivity extends Activity {
 
         float fontSize = fontSizeSeekBar.getProgress();
         WidgetPreferences.saveFontSize(this, appWidgetId, fontSize);
-
-        String fontType = (String) fontSpinner.getSelectedItem();
-        WidgetPreferences.saveFontType(this, appWidgetId, fontType);
-
-        float lineSpacing = lineSpacingSeekBar.getProgress() / 100.0f;
-        WidgetPreferences.saveLineSpacing(this, appWidgetId, lineSpacing);
 
         int borderColor = getColorFromSpinner(borderColorSpinner);
         WidgetPreferences.saveBorderColor(this, appWidgetId, borderColor);

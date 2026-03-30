@@ -45,29 +45,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Шрифт:" />
-
-        <Spinner
-            android:id="@+id/font_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Межстрочный интервал:" />
-
-        <SeekBar
-            android:id="@+id/line_spacing_seekbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="200"
-            android:min="50"
-            android:progress="100" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="Цвет рамки:" />
 
         <Spinner
