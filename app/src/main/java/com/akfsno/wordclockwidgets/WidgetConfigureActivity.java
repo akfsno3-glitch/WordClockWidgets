@@ -29,6 +29,10 @@ public class WidgetConfigureActivity extends Activity {
     private SeekBar hourOffsetXSeekBar, hourOffsetYSeekBar;
     private SeekBar minuteOffsetXSeekBar, minuteOffsetYSeekBar;
     private CheckBox showSecondsCheckbox, showDateCheckbox, showDayOfWeekCheckbox, use12HourCheckbox, secondsAsWordsCheckbox;
+    private Spinner secondsDisplayModeSpinner;
+    private Spinner blockModeSpinner;
+    private Spinner blockBackgroundColorSpinner;
+    private Spinner blockBorderColorSpinner;
     private SeekBar minuteFontSizeSeekBar, secondFontSizeSeekBar;
     private SeekBar secondOffsetXSeekBar, secondOffsetYSeekBar, dateOffsetXSeekBar, dateOffsetYSeekBar, dayOfWeekOffsetXSeekBar, dayOfWeekOffsetYSeekBar, dayNightOffsetXSeekBar, dayNightOffsetYSeekBar;
     
@@ -85,6 +89,24 @@ public class WidgetConfigureActivity extends Activity {
 
         backgroundColorSpinner = findViewById(R.id.background_color_spinner);
         backgroundColorSpinner.setAdapter(colorAdapter);
+
+        secondsDisplayModeSpinner = findViewById(R.id.seconds_display_mode_spinner);
+        ArrayAdapter<String> secondsModeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                new String[]{"Горизонтально", "Вертикально"});
+        secondsModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        secondsDisplayModeSpinner.setAdapter(secondsModeAdapter);
+
+        blockModeSpinner = findViewById(R.id.block_mode_spinner);
+        ArrayAdapter<String> blockModeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                new String[]{"Обычный", "Блочная система"});
+        blockModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        blockModeSpinner.setAdapter(blockModeAdapter);
+
+        blockBackgroundColorSpinner = findViewById(R.id.block_background_color_spinner);
+        blockBackgroundColorSpinner.setAdapter(colorAdapter);
+
+        blockBorderColorSpinner = findViewById(R.id.block_border_color_spinner);
+        blockBorderColorSpinner.setAdapter(colorAdapter);
 
         fontSizeSeekBar = findViewById(R.id.font_size_seekbar);
         fontSizeSeekBar.setProgress((int) WidgetPreferences.getFontSize(this, appWidgetId, 24f));
@@ -176,6 +198,15 @@ public class WidgetConfigureActivity extends Activity {
         use12HourCheckbox.setChecked(WidgetPreferences.getUse12HourFormat(this, appWidgetId, false));
         secondsAsWordsCheckbox.setChecked(WidgetPreferences.getSecondsAsWords(this, appWidgetId, true));
 
+        String secondsDisplayMode = WidgetPreferences.getSecondsDisplayMode(this, appWidgetId, "Горизонтально");
+        secondsDisplayModeSpinner.setSelection(secondsDisplayMode.equals("Вертикально") ? 1 : 0);
+
+        String blockMode = WidgetPreferences.getBlockMode(this, appWidgetId, "Обычный");
+        blockModeSpinner.setSelection(blockMode.equals("Блочная система") ? 1 : 0);
+
+        blockBackgroundColorSpinner.setSelection(getPositionForColor(WidgetPreferences.getBlockBackgroundColor(this, appWidgetId, Color.TRANSPARENT)));
+        blockBorderColorSpinner.setSelection(getPositionForColor(WidgetPreferences.getBlockBorderColor(this, appWidgetId, Color.GRAY)));
+
         minuteFontSizeSeekBar.setProgress((int) WidgetPreferences.getMinuteFontSize(this, appWidgetId, 24f));
         secondFontSizeSeekBar.setProgress((int) WidgetPreferences.getSecondFontSize(this, appWidgetId, 18f));
 
@@ -216,6 +247,10 @@ public class WidgetConfigureActivity extends Activity {
         colorSpinner.setOnItemSelectedListener(spinnerListener);
         borderColorSpinner.setOnItemSelectedListener(spinnerListener);
         backgroundColorSpinner.setOnItemSelectedListener(spinnerListener);
+        secondsDisplayModeSpinner.setOnItemSelectedListener(spinnerListener);
+        blockModeSpinner.setOnItemSelectedListener(spinnerListener);
+        blockBackgroundColorSpinner.setOnItemSelectedListener(spinnerListener);
+        blockBorderColorSpinner.setOnItemSelectedListener(spinnerListener);
         backgroundAlphaSeekBar.setOnSeekBarChangeListener(previewListener);
         
         showSecondsCheckbox.setOnCheckedChangeListener(checkboxListener);
@@ -277,12 +312,25 @@ public class WidgetConfigureActivity extends Activity {
         String dayNightText = NumberToWords.getDayNight(rawHour);
         String dayOfWeekText = NumberToWords.getDayOfWeek(dayOfWeek);
         String dateText = NumberToWords.convertDate(day, month, year);
-        String secondText = NumberToWords.convertMinute(second);
+
+        boolean secondsAsWords = secondsAsWordsCheckbox.isChecked();
+        String secondsDisplayMode = (String) secondsDisplayModeSpinner.getSelectedItem();
+
+        String secondText = NumberToWords.convertSecond(second, secondsAsWords);
+        if ("Вертикально".equals(secondsDisplayMode)) {
+            if (secondsAsWords) {
+                String[] secondLines = NumberToWords.convertSecondVertical(second, true);
+                secondText = android.text.TextUtils.join("\n", secondLines);
+            } else {
+                String formatted = String.format("%02d", second);
+                secondText = formatted.charAt(0) + "\n" + formatted.charAt(1);
+            }
+        }
 
         previewHourText.setText(hourText);
         previewDayNightText.setText(dayNightText);
-        previewMinuteText.setText(minuteText + (showSecondsCheckbox.isChecked() ? " " + secondText : ""));
-        
+        previewMinuteText.setText(minuteText);
+
         if (showDayOfWeekCheckbox.isChecked()) {
             previewDayOfWeekText.setVisibility(View.VISIBLE);
             previewDayOfWeekText.setText(dayOfWeekText);
@@ -300,11 +348,23 @@ public class WidgetConfigureActivity extends Activity {
         if (showSecondsCheckbox.isChecked()) {
             previewSecondText.setVisibility(View.VISIBLE);
             previewSecondText.setText(secondText);
+            previewSecondText.setTextSize(secondFontSizeSeekBar.getProgress());
         } else {
             previewSecondText.setVisibility(View.GONE);
         }
 
         int textColor = getColorFromSpinner(colorSpinner);
+        int blockBackgroundColor = getColorFromSpinner(blockBackgroundColorSpinner);
+        int blockBorderColor = getColorFromSpinner(blockBorderColorSpinner);
+
+        boolean blockModeEnabled = "Блочная система".equals(blockModeSpinner.getSelectedItem());
+
+        applyBlockStyle(previewHourText, blockModeEnabled, blockBackgroundColor, blockBorderColor);
+        applyBlockStyle(previewMinuteText, blockModeEnabled, blockBackgroundColor, blockBorderColor);
+        applyBlockStyle(previewSecondText, blockModeEnabled, blockBackgroundColor, blockBorderColor);
+        applyBlockStyle(previewDayNightText, blockModeEnabled, blockBackgroundColor, blockBorderColor);
+        applyBlockStyle(previewDayOfWeekText, blockModeEnabled, blockBackgroundColor, blockBorderColor);
+        applyBlockStyle(previewDateText, blockModeEnabled, blockBackgroundColor, blockBorderColor);
         float fontSize = fontSizeSeekBar.getProgress();
         int backgroundColor = getColorFromSpinner(backgroundColorSpinner);
         int backgroundAlpha = backgroundAlphaSeekBar.getProgress();
@@ -320,6 +380,19 @@ public class WidgetConfigureActivity extends Activity {
         previewSecondText.setTextColor(textColor);
 
         findViewById(R.id.widget_preview_container).setBackgroundColor(bgColor);
+    }
+
+    private void applyBlockStyle(TextView view, boolean enabled, int bgColor, int borderColor) {
+        if (view == null) return;
+        if (enabled) {
+            view.setBackgroundColor(bgColor);
+            view.setTextColor(borderColor);
+            view.setPadding(12, 8, 12, 8);
+        } else {
+            view.setBackgroundColor(Color.TRANSPARENT);
+            view.setTextColor(getColorFromSpinner(colorSpinner));
+            view.setPadding(0, 0, 0, 0);
+        }
     }
 
     @Override
@@ -345,6 +418,18 @@ public class WidgetConfigureActivity extends Activity {
 
         int backgroundAlpha = backgroundAlphaSeekBar.getProgress();
         WidgetPreferences.saveBackgroundAlpha(this, appWidgetId, backgroundAlpha);
+
+        String secondsDisplayMode = (String) secondsDisplayModeSpinner.getSelectedItem();
+        WidgetPreferences.saveSecondsDisplayMode(this, appWidgetId, secondsDisplayMode);
+
+        String blockMode = (String) blockModeSpinner.getSelectedItem();
+        WidgetPreferences.saveBlockMode(this, appWidgetId, blockMode);
+
+        int blockBackgroundColor = getColorFromSpinner(blockBackgroundColorSpinner);
+        WidgetPreferences.saveBlockBackgroundColor(this, appWidgetId, blockBackgroundColor);
+
+        int blockBorderColor = getColorFromSpinner(blockBorderColorSpinner);
+        WidgetPreferences.saveBlockBorderColor(this, appWidgetId, blockBorderColor);
 
         // Convert bounded progress values back to real offsets
         int minOffset = WidgetPreferences.getMinOffset();

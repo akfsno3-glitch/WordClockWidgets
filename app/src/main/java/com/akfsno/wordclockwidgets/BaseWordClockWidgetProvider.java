@@ -126,9 +126,19 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         boolean showSeconds = WidgetPreferences.getShowSeconds(context, appWidgetId, false);
         boolean showDate = WidgetPreferences.getShowDate(context, appWidgetId, false);
         boolean showDayOfWeek = WidgetPreferences.getShowDayOfWeek(context, appWidgetId, false);
+        boolean secondsAsWords = WidgetPreferences.getSecondsAsWords(context, appWidgetId, true);
+        String secondsDisplayMode = WidgetPreferences.getSecondsDisplayMode(context, appWidgetId, "Горизонтально");
 
-        if (showSeconds) {
-            minuteText = minuteText + " " + NumberToWords.convertMinute(second);
+        String secondText;
+        if (secondsDisplayMode.equals("Вертикально")) {
+            if (secondsAsWords) {
+                secondText = android.text.TextUtils.join("\n", NumberToWords.convertSecondVertical(second, true));
+            } else {
+                secondText = String.format("%02d", second);
+                secondText = secondText.charAt(0) + "\n" + secondText.charAt(1);
+            }
+        } else {
+            secondText = NumberToWords.convertSecond(second, secondsAsWords);
         }
 
         RemoteViews views = new RemoteViews(context.getPackageName(), getLayoutResource(context, appWidgetId));
@@ -136,9 +146,16 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
 
         int textColor = WidgetPreferences.getColor(context, appWidgetId, getDefaultTextColor());
         float fontSize = WidgetPreferences.getFontSize(context, appWidgetId, 24f);
+        float minuteFontSize = WidgetPreferences.getMinuteFontSize(context, appWidgetId, 24f);
+        float secondFontSize = WidgetPreferences.getSecondFontSize(context, appWidgetId, 18f);
         int borderColor = WidgetPreferences.getBorderColor(context, appWidgetId, getDefaultBorderColor());
         int backgroundColor = WidgetPreferences.getBackgroundColor(context, appWidgetId, Color.WHITE);
         int backgroundAlpha = WidgetPreferences.getBackgroundAlpha(context, appWidgetId, 255);
+        int blockBackgroundColor = WidgetPreferences.getBlockBackgroundColor(context, appWidgetId, Color.TRANSPARENT);
+        int blockBorderColor = WidgetPreferences.getBlockBorderColor(context, appWidgetId, Color.GRAY);
+        String blockMode = WidgetPreferences.getBlockMode(context, appWidgetId, "Обычный");
+        boolean blockEnabled = "Блочная система".equals(blockMode);
+
         int bgColor = Color.argb(backgroundAlpha, Color.red(backgroundColor), Color.green(backgroundColor), Color.blue(backgroundColor));
         views.setInt(R.id.widget_container, "setBackgroundColor", bgColor);
 
@@ -170,33 +187,65 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         dayNightOffsetY = WidgetPreferences.constrainOffset(dayNightOffsetY);
 
         if (getLayoutResource(context, appWidgetId) == R.layout.horizontal_widget_layout) {
-            views.setTextColor(R.id.time_text, textColor);
+            String timeText = hourText + " : " + minuteText;
+            if (showSeconds) {
+                timeText += " : " + secondText.replace("\n", " ");
+            }
+            views.setTextViewText(R.id.time_text, timeText);
+            views.setTextColor(R.id.time_text, blockEnabled ? blockBorderColor : textColor);
             views.setTextViewTextSize(R.id.time_text, 0, fontSize);
+            if (blockEnabled) {
+                views.setInt(R.id.time_text, "setBackgroundColor", blockBackgroundColor);
+            }
         } else {
-            views.setTextColor(R.id.hour_text, textColor);
+            views.setTextColor(R.id.hour_text, blockEnabled ? blockBorderColor : textColor);
             views.setTextViewTextSize(R.id.hour_text, 0, fontSize);
             views.setViewPadding(R.id.hour_text, hourOffsetX, hourOffsetY, 0, 0);
+            if (blockEnabled) {
+                views.setInt(R.id.hour_text, "setBackgroundColor", blockBackgroundColor);
+            }
 
-            views.setTextColor(R.id.minute_text, textColor);
-            views.setTextViewTextSize(R.id.minute_text, 0, fontSize);
+            views.setTextColor(R.id.minute_text, blockEnabled ? blockBorderColor : textColor);
+            views.setTextViewTextSize(R.id.minute_text, 0, minuteFontSize);
             views.setViewPadding(R.id.minute_text, minuteOffsetX, minuteOffsetY, 0, 0);
+            if (blockEnabled) {
+                views.setInt(R.id.minute_text, "setBackgroundColor", blockBackgroundColor);
+            }
 
-            views.setTextColor(R.id.day_night_text, borderColor);
+            views.setTextColor(R.id.day_night_text, blockEnabled ? blockBorderColor : borderColor);
             views.setTextViewTextSize(R.id.day_night_text, 0, fontSize * 0.75f);
             views.setViewPadding(R.id.day_night_text, dayNightOffsetX, dayNightOffsetY, 0, 0);
+            if (blockEnabled) {
+                views.setInt(R.id.day_night_text, "setBackgroundColor", blockBackgroundColor);
+            }
 
-            views.setTextColor(R.id.day_of_week_text, textColor);
+            views.setTextColor(R.id.day_of_week_text, blockEnabled ? blockBorderColor : textColor);
             views.setTextViewTextSize(R.id.day_of_week_text, 0, fontSize * 0.6f);
             views.setViewPadding(R.id.day_of_week_text, dayOfWeekOffsetX, dayOfWeekOffsetY, 0, 0);
+            if (blockEnabled) {
+                views.setInt(R.id.day_of_week_text, "setBackgroundColor", blockBackgroundColor);
+            }
             
-            views.setTextColor(R.id.date_text, textColor);
+            views.setTextColor(R.id.date_text, blockEnabled ? blockBorderColor : textColor);
             views.setTextViewTextSize(R.id.date_text, 0, fontSize * 0.5f);
             views.setViewPadding(R.id.date_text, dateOffsetX, dateOffsetY, 0, 0);
+            if (blockEnabled) {
+                views.setInt(R.id.date_text, "setBackgroundColor", blockBackgroundColor);
+            }
 
             views.setTextViewText(R.id.day_of_week_text, showDayOfWeek ? dayOfWeekText : "");
             views.setTextViewText(R.id.date_text, showDate ? dateText : "");
             views.setViewVisibility(R.id.day_of_week_text, showDayOfWeek ? View.VISIBLE : View.GONE);
             views.setViewVisibility(R.id.date_text, showDate ? View.VISIBLE : View.GONE);
+
+            views.setTextColor(R.id.second_text, blockEnabled ? blockBorderColor : textColor);
+            views.setTextViewTextSize(R.id.second_text, 0, secondFontSize);
+            views.setViewPadding(R.id.second_text, secondOffsetX, secondOffsetY, 0, 0);
+            if (blockEnabled) {
+                views.setInt(R.id.second_text, "setBackgroundColor", blockBackgroundColor);
+            }
+            views.setTextViewText(R.id.second_text, showSeconds ? secondText : "");
+            views.setViewVisibility(R.id.second_text, showSeconds ? View.VISIBLE : View.GONE);
         }
 
         Intent configIntent = new Intent(context, WidgetConfigureActivity.class);

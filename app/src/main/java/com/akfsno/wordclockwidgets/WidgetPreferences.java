@@ -277,9 +277,39 @@ public class WidgetPreferences {
         return prefs.getString("secondsDisplayMode_" + appWidgetId, defaultMode);
     }
 
+    public static void saveBlockMode(Context context, int appWidgetId, String mode) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putString("blockMode_" + appWidgetId, mode).apply();
+    }
+
+    public static String getBlockMode(Context context, int appWidgetId, String defaultMode) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getString("blockMode_" + appWidgetId, defaultMode);
+    }
+
+    public static void saveBlockBackgroundColor(Context context, int appWidgetId, int color) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putInt("blockBackgroundColor_" + appWidgetId, color).apply();
+    }
+
+    public static int getBlockBackgroundColor(Context context, int appWidgetId, int defaultColor) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getInt("blockBackgroundColor_" + appWidgetId, defaultColor);
+    }
+
+    public static void saveBlockBorderColor(Context context, int appWidgetId, int color) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putInt("blockBorderColor_" + appWidgetId, color).apply();
+    }
+
+    public static int getBlockBorderColor(Context context, int appWidgetId, int defaultColor) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getInt("blockBorderColor_" + appWidgetId, defaultColor);
+    }
+
     // Constants for offset bounds
-    private static final int MAX_OFFSET = 200;
-    private static final int MIN_OFFSET = -200;
+    private static final int MAX_OFFSET = 500;
+    private static final int MIN_OFFSET = -500;
 
     public static int constrainOffset(int value) {
         return Math.max(MIN_OFFSET, Math.min(MAX_OFFSET, value));
