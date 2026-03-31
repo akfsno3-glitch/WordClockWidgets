@@ -1,4 +1,7 @@
+package com.akfsno.wordclockwidgets;
+
 import android.content.Context;
+import android.widget.RemoteViews;
 
 public class WordClockWidgetProvider extends BaseWordClockWidgetProvider {
 

@@ -177,6 +177,16 @@ public class WidgetPreferences {
         return prefs.getFloat("minuteFontSize_" + appWidgetId, defaultSize);
     }
 
+    public static void saveSecondFontSize(Context context, int appWidgetId, float fontSize) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putFloat("secondFontSize_" + appWidgetId, fontSize).apply();
+    }
+
+    public static float getSecondFontSize(Context context, int appWidgetId, float defaultSize) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getFloat("secondFontSize_" + appWidgetId, defaultSize);
+    }
+
     public static void saveSecondOffsetX(Context context, int appWidgetId, int value) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putInt("second_offsetX_" + appWidgetId, value).apply();

@@ -21,6 +21,7 @@ public class WidgetConfigureActivity extends Activity {
     private int appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private Spinner styleSpinner, colorSpinner, borderColorSpinner, backgroundColorSpinner;
     private SeekBar fontSizeSeekBar, borderWidthSeekBar, backgroundAlphaSeekBar;
+    private SeekBar hourOffsetXSeekBar, hourOffsetYSeekBar;
     private SeekBar minuteOffsetXSeekBar, minuteOffsetYSeekBar;
     private CheckBox showSecondsCheckbox, showDateCheckbox, showDayOfWeekCheckbox, use12HourCheckbox, secondsAsWordsCheckbox;
     private SeekBar minuteFontSizeSeekBar, secondFontSizeSeekBar;
@@ -224,6 +225,22 @@ public class WidgetConfigureActivity extends Activity {
             case "Кислотный": return 3;
             case "Неоновый": return 4;
             case "Маленький": return 5;
+            default: return 0;
+        }
+    }
+
+    private int getPositionForColor(int color) {
+        switch (color) {
+            case Color.BLACK: return 0;
+            case Color.WHITE: return 1;
+            case Color.RED: return 2;
+            case Color.GREEN: return 3;
+            case Color.BLUE: return 4;
+            case Color.YELLOW: return 5;
+            case 0xFFFFA500: return 6; // orange
+            case 0xFF800080: return 7; // purple
+            case 0xFFFFC0CB: return 8; // pink
+            case Color.GRAY: return 9;
             default: return 0;
         }
     }
