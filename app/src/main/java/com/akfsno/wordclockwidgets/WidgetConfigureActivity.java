@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -234,7 +235,7 @@ public class WidgetConfigureActivity extends Activity {
         };
 
         CheckBox.OnCheckedChangeListener checkboxListener = (buttonView, isChecked) -> updatePreview();
-        Spinner.OnItemSelectedListener spinnerListener = new Spinner.OnItemSelectedListener() {
+        AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 updatePreview();
@@ -394,8 +395,6 @@ public class WidgetConfigureActivity extends Activity {
             view.setPadding(0, 0, 0, 0);
         }
     }
-
-    @Override
 
     private void saveConfiguration() {
         String style = (String) styleSpinner.getSelectedItem();
