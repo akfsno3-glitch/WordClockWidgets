@@ -44,7 +44,7 @@
         </receiver>
 
         <activity
-            android:name=".WidgetConfigureActivity"
+            android:name=".WidgetChooserActivity"
             android:exported="true"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -53,14 +53,16 @@
         </activity>
 
         <activity
-            android:name=".BasicStyleActivity"
+            android:name=".WidgetConfigureActivity"
             android:exported="true"
             android:theme="@style/AppTheme" />
 
         <activity
-            android:name=".ConstructorActivity"
+            android:name=".BasicStyleActivity"
             android:exported="true"
             android:theme="@style/AppTheme" />
+
+        <!-- ConstructorActivity is deprecated and not used -->
 
     </application>
 

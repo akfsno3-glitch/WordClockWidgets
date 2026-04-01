@@ -11,9 +11,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 public class BasicStyleActivity extends Activity {
 
     private int appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private TextView previewHour, previewMinute, previewDayNight, previewDate, previewDayOfWeek;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,13 @@ public class BasicStyleActivity extends Activity {
             return;
         }
 
+        // Initialize preview views
+        previewHour = findViewById(R.id.preview_hour);
+        previewMinute = findViewById(R.id.preview_minute);
+        previewDayNight = findViewById(R.id.preview_day_night);
+        previewDate = findViewById(R.id.preview_date);
+        previewDayOfWeek = findViewById(R.id.preview_day_of_week);
+
         // Setup UI elements
         setupBackgroundColor();
         setupBackgroundAlpha();
@@ -42,6 +52,7 @@ public class BasicStyleActivity extends Activity {
         saveButton.setOnClickListener(v -> saveAndFinish());
 
         updatePreview();
+        updatePreviewText();
     }
 
     private void setupBackgroundColor() {
@@ -188,9 +199,51 @@ public class BasicStyleActivity extends Activity {
     }
 
     private void updatePreview() {
-        // Update the preview widget
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        new WordClockWidgetProvider().onUpdate(this, appWidgetManager, new int[]{appWidgetId});
+        int bgColor = WidgetPreferences.getBackgroundColor(this, appWidgetId, 0xFFFFFFFF);
+        int alpha = WidgetPreferences.getBackgroundAlpha(this, appWidgetId, 255);
+        bgColor = (bgColor & 0x00FFFFFF) | ((alpha & 0xFF) << 24);
+        findViewById(R.id.preview_container).setBackgroundColor(bgColor);
+
+        int borderColor = WidgetPreferences.getBorderColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark));
+        android.graphics.drawable.GradientDrawable drawable = (android.graphics.drawable.GradientDrawable) findViewById(R.id.preview_container).getBackground();
+        if (drawable != null) {
+            drawable.setStroke(WidgetPreferences.getBorderWidth(this, appWidgetId, 2), borderColor);
+        }
+
+        updatePreviewText();
+    }
+
+    private void updatePreviewText() {
+        Calendar calendar = Calendar.getInstance();
+        int hour24 = calendar.get(Calendar.HOUR_OF_DAY);
+        boolean use12 = WidgetPreferences.getUse12HourFormat(this, appWidgetId, true);
+
+        String hourText = use12 ? NumberToWords.convertHour(hour24) : NumberToWords.convertHour24(hour24);
+        String minuteText = NumberToWords.convertMinute(calendar.get(Calendar.MINUTE), WidgetPreferences.getAddZeroMinute(this, appWidgetId, false));
+        String dayNightText = NumberToWords.getDayNight(hour24);
+        String dateText = NumberToWords.convertDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
+        String dayOfWeekText = NumberToWords.getDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK) - 1);
+
+        previewHour.setText(hourText);
+        previewMinute.setText(minuteText);
+        previewDayNight.setText(dayNightText);
+        previewDate.setText(dateText);
+        previewDayOfWeek.setText(dayOfWeekText);
+
+        previewHour.setTextColor(WidgetPreferences.getHourTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+        previewMinute.setTextColor(WidgetPreferences.getMinuteTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+        previewDayNight.setTextColor(WidgetPreferences.getDayNightTextColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark)));
+        previewDate.setTextColor(WidgetPreferences.getDateTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+        previewDayOfWeek.setTextColor(WidgetPreferences.getDayOfWeekTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+
+        previewHour.setTextSize(WidgetPreferences.getFontSize(this, appWidgetId, 24f));
+        previewMinute.setTextSize(WidgetPreferences.getMinuteFontSize(this, appWidgetId, 24f));
+
+        previewHour.setVisibility(WidgetPreferences.getShowHour(this, appWidgetId, true) ? View.VISIBLE : View.GONE);
+        previewMinute.setVisibility(WidgetPreferences.getShowMinute(this, appWidgetId, true) ? View.VISIBLE : View.GONE);
+        previewDayNight.setVisibility(WidgetPreferences.getShowDayNight(this, appWidgetId, true) ? View.VISIBLE : View.GONE);
+        previewDate.setVisibility(WidgetPreferences.getShowDate(this, appWidgetId, true) ? View.VISIBLE : View.GONE);
+        previewDayOfWeek.setVisibility(WidgetPreferences.getShowDayOfWeek(this, appWidgetId, true) ? View.VISIBLE : View.GONE);
     }
 
     private void saveAndFinish() {

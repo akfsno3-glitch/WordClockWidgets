@@ -23,7 +23,54 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginBottom="16dp"
-            android:background="@android:color/darker_gray" />
+            android:background="@drawable/widget_border">
+
+            <TextView
+                android:id="@+id/preview_hour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Четыре"
+                android:textColor="@android:color/black"
+                android:textSize="24sp"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/preview_minute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="пятнадцать"
+                android:textColor="@android:color/black"
+                android:textSize="24sp"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/preview_day_night"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="дня"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="18sp"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/preview_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="двадцать первое марта"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/preview_day_of_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="понедельник"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
 
         <!-- Background Color -->
         <TextView

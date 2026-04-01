@@ -54,6 +54,8 @@ public class WidgetConfigureActivity extends Activity {
         initializeViews();
         setupBlockList();
         loadOffsets();
+        setupDragAndDrop();
+        setupJoystick();
         startPreviewUpdater();
         setupButtons();
 
@@ -71,6 +73,11 @@ public class WidgetConfigureActivity extends Activity {
         previewDayNight = findViewById(R.id.preview_day_night);
         previewDate = findViewById(R.id.preview_date);
         previewDayOfWeek = findViewById(R.id.preview_day_of_week);
+        joystickUp = findViewById(R.id.joystick_up);
+        joystickDown = findViewById(R.id.joystick_down);
+        joystickLeft = findViewById(R.id.joystick_left);
+        joystickRight = findViewById(R.id.joystick_right);
+        coordinates = findViewById(R.id.coordinates);
         saveButton = findViewById(R.id.save_button);
         resetAllButton = findViewById(R.id.reset_all_button);
     }
@@ -100,6 +107,9 @@ public class WidgetConfigureActivity extends Activity {
             childList.add("Размер шрифта");
             childList.add("Показать элемент");
             childList.add("Джойстик");
+            if (group.equals("Минуты")) {
+                childList.add("+ 0 для цифр до 10");
+            }
             children.put(group, childList);
         }
 
@@ -353,7 +363,10 @@ public class WidgetConfigureActivity extends Activity {
         findViewById(R.id.preview_container).setBackgroundColor(bgColor);
 
         int borderColor = WidgetPreferences.getBorderColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark));
-        findViewById(R.id.preview_container).setBackgroundColor(borderColor);
+        // Set border color by modifying the drawable
+        View container = findViewById(R.id.preview_container);
+        android.graphics.drawable.GradientDrawable drawable = (android.graphics.drawable.GradientDrawable) container.getBackground();
+        drawable.setStroke(2, borderColor);
     }
 
     private void setupButtons() {

@@ -7,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.List;
@@ -85,6 +87,7 @@ public class BlockAdapter extends BaseExpandableListAdapter {
 
         TextView label = convertView.findViewById(R.id.child_label);
         SeekBar seekBar = convertView.findViewById(R.id.seek_bar);
+        Spinner colorSpinner = convertView.findViewById(R.id.color_spinner);
         TextView valueText = convertView.findViewById(R.id.value_text);
         Button actionButton = convertView.findViewById(R.id.reset_button);
 
@@ -92,11 +95,22 @@ public class BlockAdapter extends BaseExpandableListAdapter {
         String blockKey = getBlockKey(groupPosition);
 
         seekBar.setVisibility(View.VISIBLE);
+        colorSpinner.setVisibility(View.GONE);
         valueText.setVisibility(View.VISIBLE);
         actionButton.setVisibility(View.VISIBLE);
 
         if (child.equals("Цвет текста")) {
+            seekBar.setVisibility(View.GONE);
+            colorSpinner.setVisibility(View.VISIBLE);
+            valueText.setVisibility(View.GONE);
+            actionButton.setVisibility(View.GONE);
+
+            String[] colorNames = {"Чёрный", "Красный", "Зелёный", "Синий", "Белый"};
             int[] colors = {Color.BLACK, Color.RED, Color.GREEN, Color.BLUE, Color.WHITE};
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, colorNames);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            colorSpinner.setAdapter(adapter);
+
             int current = getTextColor(blockKey);
             int currentIndex = 0;
             for (int i = 0; i < colors.length; i++) {
@@ -105,32 +119,32 @@ public class BlockAdapter extends BaseExpandableListAdapter {
                     break;
                 }
             }
-            seekBar.setMax(colors.length - 1);
-            seekBar.setProgress(currentIndex);
-            valueText.setText("Цвет: " + getColorName(colors[currentIndex]));
+            colorSpinner.setSelection(currentIndex);
 
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            colorSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int color = colors[progress];
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                    int color = colors[position];
                     setTextColor(blockKey, color);
-                    valueText.setText("Цвет: " + getColorName(color));
                     updateWidget();
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+                public void onNothingSelected(android.widget.AdapterView<?> parent) {
                 }
             });
-
-            actionButton.setText("Применить");
-            actionButton.setOnClickListener(v -> updateWidget());
         } else if (child.equals("Цвет фона")) {
+            seekBar.setVisibility(View.GONE);
+            colorSpinner.setVisibility(View.VISIBLE);
+            valueText.setVisibility(View.GONE);
+            actionButton.setVisibility(View.GONE);
+
+            String[] colorNames = {"Белый", "Чёрный", "Красный", "Зелёный", "Синий", "Жёлтый"};
             int[] colors = {0xFFFFFFFF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFFFFFF00};
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, colorNames);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            colorSpinner.setAdapter(adapter);
+
             int current = WidgetPreferences.getBackgroundColor(context, appWidgetId, 0xFFFFFFFF);
             int currentIndex = 0;
             for (int i = 0; i < colors.length; i++) {
@@ -139,32 +153,32 @@ public class BlockAdapter extends BaseExpandableListAdapter {
                     break;
                 }
             }
-            seekBar.setMax(colors.length - 1);
-            seekBar.setProgress(currentIndex);
-            valueText.setText("Цвет: " + getColorName(colors[currentIndex]));
+            colorSpinner.setSelection(currentIndex);
 
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            colorSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int color = colors[progress];
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                    int color = colors[position];
                     WidgetPreferences.saveBackgroundColor(context, appWidgetId, color);
-                    valueText.setText("Цвет: " + getColorName(color));
                     updateWidget();
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+                public void onNothingSelected(android.widget.AdapterView<?> parent) {
                 }
             });
-
-            actionButton.setText("Применить");
-            actionButton.setOnClickListener(v -> updateWidget());
         } else if (child.equals("Цвет рамки")) {
+            seekBar.setVisibility(View.GONE);
+            colorSpinner.setVisibility(View.VISIBLE);
+            valueText.setVisibility(View.GONE);
+            actionButton.setVisibility(View.GONE);
+
+            String[] colorNames = {"Чёрный", "Белый", "Красный", "Зелёный", "Синий"};
             int[] colors = {0xFF000000, 0xFFFFFFFF, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF};
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, colorNames);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            colorSpinner.setAdapter(adapter);
+
             int current = WidgetPreferences.getBorderColor(context, appWidgetId, 0xFF000000);
             int currentIndex = 0;
             for (int i = 0; i < colors.length; i++) {
@@ -173,30 +187,20 @@ public class BlockAdapter extends BaseExpandableListAdapter {
                     break;
                 }
             }
-            seekBar.setMax(colors.length - 1);
-            seekBar.setProgress(currentIndex);
-            valueText.setText("Цвет: " + getColorName(colors[currentIndex]));
+            colorSpinner.setSelection(currentIndex);
 
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            colorSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int color = colors[progress];
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                    int color = colors[position];
                     WidgetPreferences.saveBorderColor(context, appWidgetId, color);
-                    valueText.setText("Цвет: " + getColorName(color));
                     updateWidget();
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+                public void onNothingSelected(android.widget.AdapterView<?> parent) {
                 }
             });
-
-            actionButton.setText("Применить");
-            actionButton.setOnClickListener(v -> updateWidget());
         } else if (child.equals("Непрозрачность фона")) {
             int current = WidgetPreferences.getBackgroundAlpha(context, appWidgetId, 255);
             seekBar.setMax(255);

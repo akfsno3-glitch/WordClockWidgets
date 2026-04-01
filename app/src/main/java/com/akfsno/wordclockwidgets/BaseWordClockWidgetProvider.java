@@ -3,6 +3,7 @@ package com.akfsno.wordclockwidgets;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -12,6 +13,19 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+        if (Intent.ACTION_TIME_TICK.equals(intent.getAction()) || Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())) {
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            ComponentName thisWidget = new ComponentName(context, this.getClass());
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+            if (appWidgetIds != null && appWidgetIds.length > 0) {
+                onUpdate(context, appWidgetManager, appWidgetIds);
+            }
+        }
+    }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
