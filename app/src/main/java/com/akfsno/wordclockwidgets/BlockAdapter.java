@@ -329,16 +329,6 @@ public class BlockAdapter extends BaseExpandableListAdapter {
                 valueText.setText(newValue ? "Показать" : "Скрыть");
                 updateWidget();
             });
-        } else if (child.equals("Джойстик")) {
-            seekBar.setVisibility(View.GONE);
-            int[] offsets = getOffsets(blockKey);
-            valueText.setText("X: " + offsets[0] + ", Y: " + offsets[1]);
-            actionButton.setText("Изменить");
-            actionButton.setOnClickListener(v -> {
-                // TODO: open dialog to input X,Y
-                // For now, just update
-                updateWidget();
-            });
         } else {
             seekBar.setVisibility(View.GONE);
             valueText.setVisibility(View.GONE);
@@ -366,14 +356,16 @@ public class BlockAdapter extends BaseExpandableListAdapter {
     private String getBlockKey(int groupPosition) {
         switch (groupPosition) {
             case 0:
-                return "hour";
+                return "general";
             case 1:
-                return "minute";
+                return "hour";
             case 2:
-                return "dayNight";
+                return "minute";
             case 3:
-                return "date";
+                return "dayNight";
             case 4:
+                return "date";
+            case 5:
                 return "dayOfWeek";
             default:
                 return "hour";
@@ -383,12 +375,18 @@ public class BlockAdapter extends BaseExpandableListAdapter {
     private float getFontSize(String key) {
         if (key.equals("hour")) return WidgetPreferences.getFontSize(context, appWidgetId, 24f);
         if (key.equals("minute")) return WidgetPreferences.getMinuteFontSize(context, appWidgetId, 24f);
+        if (key.equals("dayNight")) return WidgetPreferences.getDayNightFontSize(context, appWidgetId, 18f);
+        if (key.equals("date")) return WidgetPreferences.getDateFontSize(context, appWidgetId, 18f);
+        if (key.equals("dayOfWeek")) return WidgetPreferences.getDayOfWeekFontSize(context, appWidgetId, 18f);
         return 24f;
     }
 
     private void setFontSize(String key, float size) {
         if (key.equals("hour")) WidgetPreferences.saveFontSize(context, appWidgetId, size);
         else if (key.equals("minute")) WidgetPreferences.saveMinuteFontSize(context, appWidgetId, size);
+        else if (key.equals("dayNight")) WidgetPreferences.saveDayNightFontSize(context, appWidgetId, size);
+        else if (key.equals("date")) WidgetPreferences.saveDateFontSize(context, appWidgetId, size);
+        else if (key.equals("dayOfWeek")) WidgetPreferences.saveDayOfWeekFontSize(context, appWidgetId, size);
     }
 
     private int[] getOffsets(String key) {

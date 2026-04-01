@@ -94,6 +94,7 @@ public class BasicStyleActivity extends Activity {
                 WidgetPreferences.saveBackgroundColor(BasicStyleActivity.this, appWidgetId, colors[position]);
                 valueText.setText(names[position]);
                 updatePreview();
+                updateWidget();
             }
 
             @Override
@@ -115,6 +116,7 @@ public class BasicStyleActivity extends Activity {
                 WidgetPreferences.saveBackgroundAlpha(BasicStyleActivity.this, appWidgetId, progress);
                 valueText.setText(String.valueOf(progress));
                 updatePreview();
+                updateWidget();
             }
 
             @Override
@@ -154,6 +156,7 @@ public class BasicStyleActivity extends Activity {
                 WidgetPreferences.saveDayNightTextColor(BasicStyleActivity.this, appWidgetId, color);
                 valueText.setText(names[position]);
                 updatePreview();
+                updateWidget();
             }
 
             @Override
@@ -187,6 +190,7 @@ public class BasicStyleActivity extends Activity {
                 WidgetPreferences.saveBorderColor(BasicStyleActivity.this, appWidgetId, colors[position]);
                 valueText.setText(names[position]);
                 updatePreview();
+                updateWidget();
             }
 
             @Override
@@ -209,6 +213,7 @@ public class BasicStyleActivity extends Activity {
                 WidgetPreferences.saveBorderWidth(BasicStyleActivity.this, appWidgetId, width);
                 valueText.setText(String.valueOf(width));
                 updatePreview();
+                updateWidget();
             }
 
             @Override
@@ -234,6 +239,7 @@ public class BasicStyleActivity extends Activity {
                 WidgetPreferences.saveDayNightFontSize(BasicStyleActivity.this, appWidgetId, size);
                 valueText.setText(String.valueOf((int) size));
                 updatePreview();
+                updateWidget();
             }
 
             @Override
@@ -254,6 +260,7 @@ public class BasicStyleActivity extends Activity {
             WidgetPreferences.saveUse12HourFormat(BasicStyleActivity.this, appWidgetId, isChecked);
             checkBox.setText(isChecked ? "12-часовой формат" : "24-часовой формат");
             updatePreview();
+            updateWidget();
         });
     }
 
@@ -272,6 +279,7 @@ public class BasicStyleActivity extends Activity {
                 WidgetPreferences.saveFontSize(BasicStyleActivity.this, appWidgetId, size);
                 valueText.setText(String.valueOf((int) size));
                 updatePreview();
+                updateWidget();
             }
 
             @Override
@@ -297,6 +305,7 @@ public class BasicStyleActivity extends Activity {
                 WidgetPreferences.saveMinuteFontSize(BasicStyleActivity.this, appWidgetId, size);
                 valueText.setText(String.valueOf((int) size));
                 updatePreview();
+                updateWidget();
             }
 
             @Override
@@ -333,6 +342,11 @@ public class BasicStyleActivity extends Activity {
 
         String hourText = use12 ? NumberToWords.convertHour(hour24) : NumberToWords.convertHour24(hour24);
         String minuteText = NumberToWords.convertMinute(calendar.get(Calendar.MINUTE), WidgetPreferences.getAddZeroMinute(this, appWidgetId, false));
+
+        if (!use12 && hour24 == 0 && calendar.get(Calendar.MINUTE) == 0) {
+            hourText = "двенадцать";
+            minuteText = "ноль-ноль";
+        }
         String dayNightText = NumberToWords.getDayNight(hour24);
 
         previewHour.setText(hourText);
@@ -353,11 +367,9 @@ public class BasicStyleActivity extends Activity {
         previewDayNight.setVisibility(View.VISIBLE);
     }
 
-    private void saveAndFinish() {
-        Intent resultValue = new Intent();
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        setResult(RESULT_OK, resultValue);
-        finish();
+    private void updateWidget() {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        new WordClockWidgetProvider().onUpdate(this, appWidgetManager, new int[]{appWidgetId});
     }
 
     private String getColorName(int color) {

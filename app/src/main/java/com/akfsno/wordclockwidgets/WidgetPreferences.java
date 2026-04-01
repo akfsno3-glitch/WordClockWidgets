@@ -267,6 +267,26 @@ public class WidgetPreferences {
         return prefs.getFloat("dayNightFontSize_" + appWidgetId, defaultSize);
     }
 
+    public static void saveDateFontSize(Context context, int appWidgetId, float fontSize) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putFloat("dateFontSize_" + appWidgetId, fontSize).apply();
+    }
+
+    public static float getDateFontSize(Context context, int appWidgetId, float defaultSize) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getFloat("dateFontSize_" + appWidgetId, defaultSize);
+    }
+
+    public static void saveDayOfWeekFontSize(Context context, int appWidgetId, float fontSize) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putFloat("dayOfWeekFontSize_" + appWidgetId, fontSize).apply();
+    }
+
+    public static float getDayOfWeekFontSize(Context context, int appWidgetId, float defaultSize) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getFloat("dayOfWeekFontSize_" + appWidgetId, defaultSize);
+    }
+
     public static void saveDateOffsetX(Context context, int appWidgetId, int value) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putInt("date_offsetX_" + appWidgetId, value).apply();

@@ -41,7 +41,10 @@ public class WidgetConfigureActivity extends Activity {
     private int currentBorderColor = 0xFF000000;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onPause() {
+        super.onPause();
+        saveOffsets();
+    }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_constructor);
 
@@ -105,7 +108,6 @@ public class WidgetConfigureActivity extends Activity {
             childList.add("Цвет текста");
             childList.add("Размер шрифта");
             childList.add("Показать элемент");
-            childList.add("Джойстик");
             if (group.equals("Минуты")) {
                 childList.add("+ 0 для цифр до 10");
             }
@@ -198,6 +200,7 @@ public class WidgetConfigureActivity extends Activity {
                         off[1] = WidgetPreferences.constrainOffset(off[1]);
                         view.setTranslationX(off[0]);
                         view.setTranslationY(off[1]);
+                        saveOffsets();
                         updateCoordinates();
                         return true;
                 }
@@ -325,6 +328,11 @@ public class WidgetConfigureActivity extends Activity {
 
         String hourText = use12 ? NumberToWords.convertHour(hour24) : NumberToWords.convertHour24(hour24);
         String minuteText = NumberToWords.convertMinute(calendar.get(Calendar.MINUTE), WidgetPreferences.getAddZeroMinute(this, appWidgetId, false));
+
+        if (!use12 && hour24 == 0 && calendar.get(Calendar.MINUTE) == 0) {
+            hourText = "двенадцать";
+            minuteText = "ноль-ноль";
+        }
         String dayNightText = NumberToWords.getDayNight(hour24);
         String dateText = NumberToWords.convertDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
         String dayOfWeekText = NumberToWords.getDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK) - 1);
@@ -345,18 +353,21 @@ public class WidgetConfigureActivity extends Activity {
 
         if (previewDayNight != null) {
             previewDayNight.setText(dayNightText);
+            previewDayNight.setTextSize(WidgetPreferences.getDayNightFontSize(this, appWidgetId, 18f));
             previewDayNight.setTextColor(WidgetPreferences.getDayNightTextColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark)));
             previewDayNight.setVisibility(showDayNight ? View.VISIBLE : View.GONE);
         }
 
         if (previewDate != null) {
             previewDate.setText(dateText);
+            previewDate.setTextSize(WidgetPreferences.getDateFontSize(this, appWidgetId, 18f));
             previewDate.setTextColor(WidgetPreferences.getDateTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
             previewDate.setVisibility(showDate ? View.VISIBLE : View.GONE);
         }
 
         if (previewDayOfWeek != null) {
             previewDayOfWeek.setText(dayOfWeekText);
+            previewDayOfWeek.setTextSize(WidgetPreferences.getDayOfWeekFontSize(this, appWidgetId, 18f));
             previewDayOfWeek.setTextColor(WidgetPreferences.getDayOfWeekTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
             previewDayOfWeek.setVisibility(showDayOfWeek ? View.VISIBLE : View.GONE);
         }

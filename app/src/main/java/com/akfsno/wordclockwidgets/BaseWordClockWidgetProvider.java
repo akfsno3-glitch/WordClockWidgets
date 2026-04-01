@@ -67,6 +67,11 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
 
         String hourText = use12Hour ? NumberToWords.convertHour(hour24) : NumberToWords.convertHour24(hour24);
         String minuteText = NumberToWords.convertMinute(calendar.get(Calendar.MINUTE), addZeroMinute);
+
+        if (!use12Hour && hour24 == 0 && calendar.get(Calendar.MINUTE) == 0) {
+            hourText = "двенадцать";
+            minuteText = "ноль-ноль";
+        }
         String dayNightText = NumberToWords.getDayNight(hour24);
         String dayOfWeekText = NumberToWords.getDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK) - 1);
         String dateText = NumberToWords.convertDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
