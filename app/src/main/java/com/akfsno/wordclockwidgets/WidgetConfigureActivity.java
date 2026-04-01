@@ -24,7 +24,7 @@ public class WidgetConfigureActivity extends Activity {
 
     private int appWidgetId;
     private ExpandableListView blockList;
-    private TextView previewHour, previewMinute, previewSecond, previewDayNight, previewDate, previewDayOfWeek;
+    private TextView previewHour, previewMinute, previewDayNight, previewDate, previewDayOfWeek;
     private Button joystickUp, joystickDown, joystickLeft, joystickRight;
     private TextView coordinates;
     private Button saveButton, applyButton, resetAllButton;
@@ -69,7 +69,6 @@ public class WidgetConfigureActivity extends Activity {
         blockList = findViewById(R.id.block_list);
         previewHour = findViewById(R.id.preview_hour);
         previewMinute = findViewById(R.id.preview_minute);
-        previewSecond = findViewById(R.id.preview_second);
         previewDayNight = findViewById(R.id.preview_day_night);
         previewDate = findViewById(R.id.preview_date);
         previewDayOfWeek = findViewById(R.id.preview_day_of_week);
@@ -206,7 +205,6 @@ public class WidgetConfigureActivity extends Activity {
 
         previewHour.setOnTouchListener(dragListener);
         previewMinute.setOnTouchListener(dragListener);
-        previewSecond.setOnTouchListener(dragListener);
         previewDayNight.setOnTouchListener(dragListener);
         previewDate.setOnTouchListener(dragListener);
         previewDayOfWeek.setOnTouchListener(dragListener);
@@ -215,7 +213,6 @@ public class WidgetConfigureActivity extends Activity {
     private String getBlockFromView(View view) {
         if (view == previewHour) return "hour";
         if (view == previewMinute) return "minute";
-        if (view == previewSecond) return "second";
         if (view == previewDayNight) return "dayNight";
         if (view == previewDate) return "date";
         if (view == previewDayOfWeek) return "dayOfWeek";
@@ -320,42 +317,70 @@ public class WidgetConfigureActivity extends Activity {
         boolean use12 = WidgetPreferences.getUse12HourFormat(this, appWidgetId, true);
         boolean showHour = WidgetPreferences.getShowHour(this, appWidgetId, true);
         boolean showMinute = WidgetPreferences.getShowMinute(this, appWidgetId, true);
-        boolean showSecond = WidgetPreferences.getShowSeconds(this, appWidgetId, false);
         boolean showDayNight = WidgetPreferences.getShowDayNight(this, appWidgetId, true);
         boolean showDate = WidgetPreferences.getShowDate(this, appWidgetId, true);
         boolean showDayOfWeek = WidgetPreferences.getShowDayOfWeek(this, appWidgetId, true);
 
         String hourText = use12 ? NumberToWords.convertHour(hour24) : NumberToWords.convertHour24(hour24);
         String minuteText = NumberToWords.convertMinute(calendar.get(Calendar.MINUTE), WidgetPreferences.getAddZeroMinute(this, appWidgetId, false));
-        String secondText = NumberToWords.convertSecond(calendar.get(Calendar.SECOND), true, WidgetPreferences.getAddZeroSecond(this, appWidgetId, false));
         String dayNightText = NumberToWords.getDayNight(hour24);
         String dateText = NumberToWords.convertDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
         String dayOfWeekText = NumberToWords.getDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK) - 1);
 
-        previewHour.setText(hourText);
-        previewMinute.setText(minuteText);
-        previewSecond.setText(secondText);
-        previewDayNight.setText(dayNightText);
-        previewDate.setText(dateText);
-        previewDayOfWeek.setText(dayOfWeekText);
+        if (previewHour != null) {
+            previewHour.setText(hourText);
+            previewHour.setTextSize(WidgetPreferences.getFontSize(this, appWidgetId, 24f));
+            previewHour.setTextColor(WidgetPreferences.getHourTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+            previewHour.setVisibility(showHour ? View.VISIBLE : View.GONE);
+        }
 
-        previewHour.setTextSize(WidgetPreferences.getFontSize(this, appWidgetId, 24f));
-        previewMinute.setTextSize(WidgetPreferences.getMinuteFontSize(this, appWidgetId, 24f));
-        previewSecond.setTextSize(WidgetPreferences.getSecondFontSize(this, appWidgetId, 18f));
+        if (previewMinute != null) {
+            previewMinute.setText(minuteText);
+            previewMinute.setTextSize(WidgetPreferences.getMinuteFontSize(this, appWidgetId, 24f));
+            previewMinute.setTextColor(WidgetPreferences.getMinuteTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+            previewMinute.setVisibility(showMinute ? View.VISIBLE : View.GONE);
+        }
 
-        previewHour.setTextColor(WidgetPreferences.getHourTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
-        previewMinute.setTextColor(WidgetPreferences.getMinuteTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
-        previewSecond.setTextColor(WidgetPreferences.getSecondTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
-        previewDayNight.setTextColor(WidgetPreferences.getDayNightTextColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark)));
-        previewDate.setTextColor(WidgetPreferences.getDateTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
-        previewDayOfWeek.setTextColor(WidgetPreferences.getDayOfWeekTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+        if (previewDayNight != null) {
+            previewDayNight.setText(dayNightText);
+            previewDayNight.setTextColor(WidgetPreferences.getDayNightTextColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark)));
+            previewDayNight.setVisibility(showDayNight ? View.VISIBLE : View.GONE);
+        }
 
-        previewHour.setVisibility(showHour ? View.VISIBLE : View.GONE);
-        previewMinute.setVisibility(showMinute ? View.VISIBLE : View.GONE);
-        previewSecond.setVisibility(showSecond ? View.VISIBLE : View.GONE);
-        previewDayNight.setVisibility(showDayNight ? View.VISIBLE : View.GONE);
-        previewDate.setVisibility(showDate ? View.VISIBLE : View.GONE);
-        previewDayOfWeek.setVisibility(showDayOfWeek ? View.VISIBLE : View.GONE);
+        if (previewDate != null) {
+            previewDate.setText(dateText);
+            previewDate.setTextColor(WidgetPreferences.getDateTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+            previewDate.setVisibility(showDate ? View.VISIBLE : View.GONE);
+        }
+
+        if (previewDayOfWeek != null) {
+            previewDayOfWeek.setText(dayOfWeekText);
+            previewDayOfWeek.setTextColor(WidgetPreferences.getDayOfWeekTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+            previewDayOfWeek.setVisibility(showDayOfWeek ? View.VISIBLE : View.GONE);
+        }
+
+        // no seconds in preview anymore
+        if (previewHour != null) {
+            previewHour.setTextColor(WidgetPreferences.getHourTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+        }
+        if (previewMinute != null) {
+            previewMinute.setTextColor(WidgetPreferences.getMinuteTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+        }
+        if (previewDayNight != null) {
+            previewDayNight.setTextColor(WidgetPreferences.getDayNightTextColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark)));
+        }
+        if (previewDate != null) {
+            previewDate.setTextColor(WidgetPreferences.getDateTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+        }
+        if (previewDayOfWeek != null) {
+            previewDayOfWeek.setTextColor(WidgetPreferences.getDayOfWeekTextColor(this, appWidgetId, getResources().getColor(android.R.color.black)));
+        }
+
+        if (previewHour != null) previewHour.setVisibility(showHour ? View.VISIBLE : View.GONE);
+        if (previewMinute != null) previewMinute.setVisibility(showMinute ? View.VISIBLE : View.GONE);
+        if (previewDayNight != null) previewDayNight.setVisibility(showDayNight ? View.VISIBLE : View.GONE);
+        if (previewDate != null) previewDate.setVisibility(showDate ? View.VISIBLE : View.GONE);
+        if (previewDayOfWeek != null) previewDayOfWeek.setVisibility(showDayOfWeek ? View.VISIBLE : View.GONE);
 
         int bgColor = WidgetPreferences.getBackgroundColor(this, appWidgetId, 0xFFFFFFFF);
         int alpha = WidgetPreferences.getBackgroundAlpha(this, appWidgetId, 255);

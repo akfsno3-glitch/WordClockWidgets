@@ -47,15 +47,6 @@
             android:layout_gravity="center" />
 
         <TextView
-            android:id="@+id/preview_second"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="тридцать"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:layout_gravity="center" />
-
-        <TextView
             android:id="@+id/preview_day_night"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

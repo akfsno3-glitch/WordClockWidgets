@@ -56,15 +56,6 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/preview_second_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="пять"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:visibility="gone" />
-
     </LinearLayout>
 
 </FrameLayout>
