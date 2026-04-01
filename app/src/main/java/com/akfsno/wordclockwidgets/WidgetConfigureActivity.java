@@ -167,25 +167,27 @@ public class WidgetConfigureActivity extends Activity {
 
     private void setupDragAndDrop() {
         View.OnTouchListener dragListener = new View.OnTouchListener() {
-            private float dX, dY;
+            private float startRawX, startRawY;
+            private float initialX, initialY;
             private String draggedBlock;
 
             @Override
             public boolean onTouch(View view, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        dX = view.getX() - event.getRawX();
-                        dY = view.getY() - event.getRawY();
+                        startRawX = event.getRawX();
+                        startRawY = event.getRawY();
+                        initialX = view.getTranslationX();
+                        initialY = view.getTranslationY();
                         draggedBlock = getBlockFromView(view);
                         selectedBlock = draggedBlock;
                         updateCoordinates();
                         return true;
                     case MotionEvent.ACTION_MOVE:
-                        view.animate()
-                            .x(event.getRawX() + dX)
-                            .y(event.getRawY() + dY)
-                            .setDuration(0)
-                            .start();
+                        float deltaX = event.getRawX() - startRawX;
+                        float deltaY = event.getRawY() - startRawY;
+                        view.setTranslationX(initialX + deltaX);
+                        view.setTranslationY(initialY + deltaY);
                         return true;
                     case MotionEvent.ACTION_UP:
                         // Update offsets

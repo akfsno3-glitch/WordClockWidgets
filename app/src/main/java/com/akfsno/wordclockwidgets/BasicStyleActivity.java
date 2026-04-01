@@ -202,12 +202,16 @@ public class BasicStyleActivity extends Activity {
         int bgColor = WidgetPreferences.getBackgroundColor(this, appWidgetId, 0xFFFFFFFF);
         int alpha = WidgetPreferences.getBackgroundAlpha(this, appWidgetId, 255);
         bgColor = (bgColor & 0x00FFFFFF) | ((alpha & 0xFF) << 24);
-        findViewById(R.id.preview_container).setBackgroundColor(bgColor);
 
-        int borderColor = WidgetPreferences.getBorderColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark));
-        android.graphics.drawable.GradientDrawable drawable = (android.graphics.drawable.GradientDrawable) findViewById(R.id.preview_container).getBackground();
-        if (drawable != null) {
+        View container = findViewById(R.id.preview_container);
+        android.graphics.drawable.Drawable bg = container.getBackground();
+        if (bg instanceof android.graphics.drawable.GradientDrawable) {
+            android.graphics.drawable.GradientDrawable drawable = (android.graphics.drawable.GradientDrawable) bg.mutate();
+            drawable.setColor(bgColor);
+            int borderColor = WidgetPreferences.getBorderColor(this, appWidgetId, getResources().getColor(android.R.color.holo_red_dark));
             drawable.setStroke(WidgetPreferences.getBorderWidth(this, appWidgetId, 2), borderColor);
+        } else {
+            container.setBackgroundColor(bgColor);
         }
 
         updatePreviewText();
