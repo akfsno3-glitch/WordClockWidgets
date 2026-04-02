@@ -294,10 +294,12 @@ public class WidgetConfigureActivity extends Activity {
 
     private int[] constrainOffsetToPreview(View view, int x, int y) {
         if (previewContainer == null || view == null) {
-            int maxPreview = WidgetPreferences.getMaxOffset();
-            int minPreview = WidgetPreferences.getMinOffset();
-            int boundedX = Math.max(minPreview, Math.min(maxPreview, x));
-            int boundedY = Math.max(minPreview, Math.min(maxPreview, y));
+            int maxX = WidgetPreferences.getMaxOffsetX();
+            int minX = WidgetPreferences.getMinOffsetX();
+            int maxY = WidgetPreferences.getMaxOffsetY();
+            int minY = WidgetPreferences.getMinOffsetY();
+            int boundedX = Math.max(minX, Math.min(maxX, x));
+            int boundedY = Math.max(minY, Math.min(maxY, y));
             return new int[]{boundedX, boundedY};
         }
 
@@ -307,7 +309,7 @@ public class WidgetConfigureActivity extends Activity {
         int viewH = view.getHeight();
 
         if (containerW == 0 || containerH == 0 || viewW == 0 || viewH == 0) {
-            return new int[]{WidgetPreferences.constrainOffset(x), WidgetPreferences.constrainOffset(y)};
+            return new int[]{WidgetPreferences.constrainOffsetX(x), WidgetPreferences.constrainOffsetY(y)};
         }
 
         int borderPx = 0; // Allow full workspace usage
@@ -471,7 +473,19 @@ public class WidgetConfigureActivity extends Activity {
         int[] off = blockOffsets.get(selectedBlock);
         int realX = previewToWidgetX(off[0]);
         int realY = previewToWidgetY(off[1]);
-        coordinates.setText("(preview: " + off[0] + "," + off[1] + ", widget: " + realX + "," + realY + ")");
+        
+        // Calculate grid cell (6 columns x 2 rows)
+        float cellWidth = previewPixelWidth / 6f;
+        float cellHeight = previewPixelHeight / 2f;
+        int col = (int) ((off[0] + previewPixelWidth / 2f) / cellWidth);
+        int row = (int) ((off[1] + previewPixelHeight / 2f) / cellHeight);
+        
+        // Clamp to valid grid range
+        col = Math.max(0, Math.min(5, col));
+        row = Math.max(0, Math.min(1, row));
+        
+        coordinates.setText(String.format("Grid: [%d,%d] | Preview: (%d,%d) | Widget: (%d,%d)", 
+            col, row, off[0], off[1], realX, realY));
     }
 
     private void setupGeneralControls() {

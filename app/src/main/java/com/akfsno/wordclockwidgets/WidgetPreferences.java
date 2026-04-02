@@ -388,18 +388,45 @@ public class WidgetPreferences {
     }
 
     // Constants for offset bounds
-    private static final int MAX_OFFSET = 170;
-    private static final int MIN_OFFSET = -170;
+    private static final int MAX_OFFSET_X = 170;
+    private static final int MIN_OFFSET_X = -170;
+    private static final int MAX_OFFSET_Y = 230;  // +60 for vertical
+    private static final int MIN_OFFSET_Y = -230;
+
+    public static int constrainOffsetX(int value) {
+        return Math.max(MIN_OFFSET_X, Math.min(MAX_OFFSET_X, value));
+    }
+
+    public static int constrainOffsetY(int value) {
+        return Math.max(MIN_OFFSET_Y, Math.min(MAX_OFFSET_Y, value));
+    }
 
     public static int constrainOffset(int value) {
-        return Math.max(MIN_OFFSET, Math.min(MAX_OFFSET, value));
+        // Backward compatibility - use X bounds
+        return constrainOffsetX(value);
     }
 
     public static int getMaxOffset() {
-        return MAX_OFFSET;
+        return MAX_OFFSET_X;
+    }
+
+    public static int getMaxOffsetX() {
+        return MAX_OFFSET_X;
+    }
+
+    public static int getMaxOffsetY() {
+        return MAX_OFFSET_Y;
     }
 
     public static int getMinOffset() {
-        return MIN_OFFSET;
+        return MIN_OFFSET_X;
+    }
+
+    public static int getMinOffsetX() {
+        return MIN_OFFSET_X;
+    }
+
+    public static int getMinOffsetY() {
+        return MIN_OFFSET_Y;
     }
 }
