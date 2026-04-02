@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -289,6 +290,11 @@ public class WidgetConfigureActivity extends Activity {
     }
 
     private void applyMarginWithBounds(String block, View view) {
+        if (view == null || previewContainer == null) {
+            Log.w("WidgetConfigureActivity", "applyMarginWithBounds: view or previewContainer is null for block " + block);
+            return;
+        }
+
         int[] off = blockOffsets.get(block);
         if (off == null) return;
 
@@ -312,6 +318,7 @@ public class WidgetConfigureActivity extends Activity {
 
     private int[] constrainOffsetToPreview(View view, int x, int y) {
         if (previewContainer == null || view == null) {
+            Log.w("WidgetConfigureActivity", "constrainOffsetToPreview: previewContainer or view is null, using default bounds");
             int maxX = WidgetPreferences.getMaxOffsetX();
             int minX = WidgetPreferences.getMinOffsetX();
             int maxY = WidgetPreferences.getMaxOffsetY();
@@ -326,8 +333,14 @@ public class WidgetConfigureActivity extends Activity {
         int viewW = view.getWidth();
         int viewH = view.getHeight();
 
-        if (containerW == 0 || containerH == 0 || viewW == 0 || viewH == 0) {
-            return new int[]{WidgetPreferences.constrainOffsetX(x), WidgetPreferences.constrainOffsetY(y)};
+        if (containerW <= 0 || containerH <= 0 || viewW <= 0 || viewH <= 0) {
+            int maxX = WidgetPreferences.getMaxOffsetX();
+            int minX = WidgetPreferences.getMinOffsetX();
+            int maxY = WidgetPreferences.getMaxOffsetY();
+            int minY = WidgetPreferences.getMinOffsetY();
+            int boundedX = Math.max(minX, Math.min(maxX, x));
+            int boundedY = Math.max(minY, Math.min(maxY, y));
+            return new int[]{boundedX, boundedY};
         }
 
         int maxX = (containerW - viewW) / 2;

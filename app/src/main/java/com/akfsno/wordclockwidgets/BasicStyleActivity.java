@@ -338,6 +338,7 @@ public class BasicStyleActivity extends Activity {
 
     private void updatePreview() {
         BaseWordClockWidgetProvider.updateLocalWidgetView(this, findViewById(R.id.preview_container), appWidgetId);
+        adjustPreviewTextSizes();
     }
 
     private void updatePreviewText() {
