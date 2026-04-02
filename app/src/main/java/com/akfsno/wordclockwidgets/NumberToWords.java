@@ -23,7 +23,7 @@ public class NumberToWords {
     };
 
     public static String convertHour(int hour) {
-        if (hour == 0) return "двенадцать";
+        if (hour == 0 || hour == 12) return "двенадцать";
         if (hour > 12) hour -= 12;
         return hours[hour];
     }
@@ -146,6 +146,9 @@ public class NumberToWords {
     };
 
     public static String getDayOfWeek(int dayOfWeek) {
+        if (dayOfWeek < 0 || dayOfWeek >= daysOfWeek.length) {
+            return "";
+        }
         return daysOfWeek[dayOfWeek];
     }
 
@@ -155,6 +158,9 @@ public class NumberToWords {
     };
 
     public static String convertDate(int day, int month, int year) {
+        if (day < 1 || day > 31 || month < 1 || month > 12) {
+            return "";
+        }
         String dayStr = convertOrdinal(day);
         String monthStr = months[month - 1];
         return dayStr + " " + monthStr;
