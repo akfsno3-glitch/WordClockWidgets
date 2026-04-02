@@ -12,17 +12,18 @@
         android:layout_height="match_parent"
         android:background="@drawable/widget_border">
 
-        <!-- Transparent content container for positioning -->
-        <FrameLayout
+        <!-- Vertical layout for basic style positioning -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
 
-            <!-- Hour text wrapper for independent positioning -->
+            <!-- Hour text wrapper -->
             <FrameLayout
                 android:id="@+id/hour_wrapper"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/hour_text"
                     android:layout_width="wrap_content"
@@ -33,12 +34,25 @@
                     android:textStyle="bold" />
             </FrameLayout>
 
-            <!-- Minute text wrapper for independent positioning -->
+            <!-- Day/Night wrapper -->
+            <FrameLayout
+                android:id="@+id/day_night_wrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/day_night_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="дня"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="18sp" />
+            </FrameLayout>
+
+            <!-- Minute text wrapper -->
             <FrameLayout
                 android:id="@+id/minute_wrapper"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/minute_text"
                     android:layout_width="wrap_content"
@@ -49,27 +63,11 @@
                     android:textStyle="bold" />
             </FrameLayout>
 
-            <!-- Day/Night wrapper for independent positioning -->
-            <FrameLayout
-                android:id="@+id/day_night_wrapper"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
-                <TextView
-                    android:id="@+id/day_night_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="дня"
-                    android:textColor="@android:color/holo_red_dark"
-                    android:textSize="18sp" />
-            </FrameLayout>
-
-            <!-- Date wrapper for independent positioning -->
+            <!-- Date wrapper -->
             <FrameLayout
                 android:id="@+id/date_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:visibility="gone">
                 <TextView
                     android:id="@+id/date_text"
@@ -80,12 +78,11 @@
                     android:textSize="14sp" />
             </FrameLayout>
 
-            <!-- Day of Week wrapper for independent positioning -->
+            <!-- Day of Week wrapper -->
             <FrameLayout
                 android:id="@+id/day_of_week_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:visibility="gone">
                 <TextView
                     android:id="@+id/day_of_week_text"
@@ -96,7 +93,7 @@
                     android:textSize="16sp" />
             </FrameLayout>
 
-        </FrameLayout>
+        </LinearLayout>
 
     </FrameLayout>
 

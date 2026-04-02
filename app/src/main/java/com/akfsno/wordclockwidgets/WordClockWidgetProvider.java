@@ -7,8 +7,8 @@ public class WordClockWidgetProvider extends BaseWordClockWidgetProvider {
 
     @Override
     protected int getLayoutResource(Context context, int appWidgetId) {
-        // оставляем только базовый стиль
-        return R.layout.widget_layout;
+        boolean useConstructorLayout = WidgetPreferences.getUseConstructorLayout(context, appWidgetId, false);
+        return useConstructorLayout ? R.layout.widget_layout : R.layout.widget_layout_basic;
     }
 
     @Override
