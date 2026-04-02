@@ -13,6 +13,7 @@ import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.util.TypedValue;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -374,6 +375,68 @@ public class BasicStyleActivity extends Activity {
         previewHour.setVisibility(View.VISIBLE);
         previewMinute.setVisibility(View.VISIBLE);
         previewDayNight.setVisibility(View.VISIBLE);
+
+        adjustPreviewTextSizes();
+    }
+
+    private void adjustPreviewTextSizes() {
+        float hourSize = WidgetPreferences.getFontSize(this, appWidgetId, 24f);
+        float minuteSize = WidgetPreferences.getMinuteFontSize(this, appWidgetId, 24f);
+        float dayNightSize = WidgetPreferences.getDayNightFontSize(this, appWidgetId, 18f);
+
+        boolean showHour = WidgetPreferences.getShowHour(this, appWidgetId, true);
+        boolean showMinute = WidgetPreferences.getShowMinute(this, appWidgetId, true);
+        boolean showDayNight = WidgetPreferences.getShowDayNight(this, appWidgetId, true);
+
+        float totalPx = 0f;
+        int visibleCount = 0;
+
+        if (showHour) {
+            totalPx += TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, hourSize, getResources().getDisplayMetrics());
+            visibleCount++;
+        }
+        if (showDayNight) {
+            totalPx += TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dayNightSize, getResources().getDisplayMetrics());
+            visibleCount++;
+        }
+        if (showMinute) {
+            totalPx += TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, minuteSize, getResources().getDisplayMetrics());
+            visibleCount++;
+        }
+
+        if (visibleCount > 1) {
+            // spacing between rows from layout margins
+            totalPx += (visibleCount - 1) * dpToPx(4);
+        }
+
+        float availablePx = getPreviewContainerAvailableHeightPx();
+
+        float scale = 1f;
+        if (totalPx > 0 && totalPx > availablePx) {
+            scale = availablePx / totalPx;
+        }
+
+        if (showHour) {
+            previewHour.setTextSize(TypedValue.COMPLEX_UNIT_SP, hourSize * scale);
+        }
+        if (showDayNight) {
+            previewDayNight.setTextSize(TypedValue.COMPLEX_UNIT_SP, dayNightSize * scale);
+        }
+        if (showMinute) {
+            previewMinute.setTextSize(TypedValue.COMPLEX_UNIT_SP, minuteSize * scale);
+        }
+    }
+
+    private float getPreviewContainerAvailableHeightPx() {
+        View container = findViewById(R.id.preview_container);
+        int heightPx = (container != null && container.getHeight() > 0) ? container.getHeight() : dpToPx(264);
+        // subtract padding from BasicStyleActivity template, if any
+        int padding = container != null ? container.getPaddingTop() + container.getPaddingBottom() : dpToPx(16);
+        return Math.max(0, heightPx - padding - dpToPx(16));
+    }
+
+    private int dpToPx(int dp) {
+        return (int) (dp * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     private void updateWidget() {
