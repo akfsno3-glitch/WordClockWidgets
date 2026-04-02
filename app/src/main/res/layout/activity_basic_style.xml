@@ -223,6 +223,14 @@
             android:layout_height="wrap_content"
             android:text="24" />
 
+        <!-- Add Zero for Small Minutes -->
+        <CheckBox
+            android:id="@+id/add_zero_minute_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+0 для цифр до 10 (минуты)"
+            android:checked="false" />
+
         <!-- Save Button -->
         <Button
             android:id="@+id/save_button"

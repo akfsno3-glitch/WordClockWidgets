@@ -63,6 +63,7 @@ public class BasicStyleActivity extends Activity {
         setupUse12Hour();
         setupHourSize();
         setupMinuteSize();
+        setupAddZeroMinute();
 
         // Set basic style defaults
         WidgetPreferences.saveShowHour(this, appWidgetId, true);
@@ -323,6 +324,18 @@ public class BasicStyleActivity extends Activity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+    }
+
+    private void setupAddZeroMinute() {
+        CheckBox checkBox = findViewById(R.id.add_zero_minute_checkbox);
+        boolean current = WidgetPreferences.getAddZeroMinute(this, appWidgetId, false);
+        checkBox.setChecked(current);
+
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            WidgetPreferences.saveAddZeroMinute(BasicStyleActivity.this, appWidgetId, isChecked);
+            updatePreview();
+            updateWidget();
         });
     }
 
