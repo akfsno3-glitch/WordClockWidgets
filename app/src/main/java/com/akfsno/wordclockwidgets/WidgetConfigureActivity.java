@@ -286,9 +286,24 @@ public class WidgetConfigureActivity extends Activity {
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT
         );
-        params.gravity = Gravity.CENTER;
-        params.leftMargin = bounded[0];
-        params.topMargin = bounded[1];
+        params.gravity = Gravity.TOP | Gravity.START;
+
+        int left;
+        if (bounded[0] >= 0) {
+            left = bounded[0];
+        } else {
+            left = previewContainer.getWidth() - view.getWidth() + bounded[0];
+        }
+
+        int top;
+        if (bounded[1] >= 0) {
+            top = bounded[1];
+        } else {
+            top = previewContainer.getHeight() - view.getHeight() + bounded[1];
+        }
+
+        params.leftMargin = left;
+        params.topMargin = top;
         view.setLayoutParams(params);
     }
 
@@ -313,13 +328,11 @@ public class WidgetConfigureActivity extends Activity {
         }
 
         int borderPx = 0; // Allow full workspace usage
-        int halfW = containerW / 2;
-        int halfH = containerH / 2;
 
-        int maxX = halfW - viewW / 2 - borderPx;
+        int maxX = containerW - viewW - borderPx;
         int minX = -maxX;
 
-        int maxY = halfH - viewH / 2 - borderPx;
+        int maxY = containerH - viewH - borderPx;
         int minY = -maxY;
 
         int boundedX = Math.max(minX, Math.min(maxX, x));
@@ -339,31 +352,45 @@ public class WidgetConfigureActivity extends Activity {
     }
 
     private int previewToWidgetX(int previewX) {
-        float previewLeft = previewPixelWidth / 2f + previewX;
+        float previewLeft = previewX >= 0 ? previewX : previewPixelWidth + previewX;
         float widgetLeft = previewLeft * getScaleX();
-        float widgetCenter = widgetLeft - dpToPx(REAL_WIDGET_DP_WIDTH) / 2f;
-        return Math.round(widgetCenter);
+        if (previewX >= 0) {
+            return Math.round(widgetLeft);
+        } else {
+            return Math.round(widgetLeft - dpToPx(REAL_WIDGET_DP_WIDTH));
+        }
     }
 
     private int previewToWidgetY(int previewY) {
-        float previewTop = previewPixelHeight / 2f + previewY;
+        float previewTop = previewY >= 0 ? previewY : previewPixelHeight + previewY;
         float widgetTop = previewTop * getScaleY();
-        float widgetCenter = widgetTop - dpToPx(REAL_WIDGET_DP_HEIGHT) / 2f;
-        return Math.round(widgetCenter);
+        if (previewY >= 0) {
+            return Math.round(widgetTop);
+        } else {
+            return Math.round(widgetTop - dpToPx(REAL_WIDGET_DP_HEIGHT));
+        }
     }
 
     private int widgetToPreviewX(int widgetX) {
-        float widgetLeft = dpToPx(REAL_WIDGET_DP_WIDTH) / 2f + widgetX;
-        float previewLeft = widgetLeft / getScaleX();
-        float previewCenter = previewLeft - previewPixelWidth / 2f;
-        return Math.round(previewCenter);
+        if (widgetX >= 0) {
+            float previewLeft = widgetX / getScaleX();
+            return Math.round(previewLeft);
+        } else {
+            float widgetRight = dpToPx(REAL_WIDGET_DP_WIDTH) + widgetX;
+            float previewRight = widgetRight / getScaleX();
+            return Math.round(previewRight - previewPixelWidth);
+        }
     }
 
     private int widgetToPreviewY(int widgetY) {
-        float widgetTop = dpToPx(REAL_WIDGET_DP_HEIGHT) / 2f + widgetY;
-        float previewTop = widgetTop / getScaleY();
-        float previewCenter = previewTop - previewPixelHeight / 2f;
-        return Math.round(previewCenter);
+        if (widgetY >= 0) {
+            float previewTop = widgetY / getScaleY();
+            return Math.round(previewTop);
+        } else {
+            float widgetBottom = dpToPx(REAL_WIDGET_DP_HEIGHT) + widgetY;
+            float previewBottom = widgetBottom / getScaleY();
+            return Math.round(previewBottom - previewPixelHeight);
+        }
     }
 
     private void setupDragAndDrop() {
@@ -474,18 +501,23 @@ public class WidgetConfigureActivity extends Activity {
         int realX = previewToWidgetX(off[0]);
         int realY = previewToWidgetY(off[1]);
         
-        // Calculate grid cell (6 columns x 2 rows)
+        // Calculate grid cell (6 columns x 2 rows) from edge-based coordinates
         float cellWidth = previewPixelWidth / 6f;
         float cellHeight = previewPixelHeight / 2f;
-        int col = (int) ((off[0] + previewPixelWidth / 2f) / cellWidth);
-        int row = (int) ((off[1] + previewPixelHeight / 2f) / cellHeight);
-        
+        float xForGrid = off[0] >= 0 ? off[0] : previewPixelWidth + off[0];
+        float yForGrid = off[1] >= 0 ? off[1] : previewPixelHeight + off[1];
+        int col = (int) (xForGrid / cellWidth);
+        int row = (int) (yForGrid / cellHeight);
+
         // Clamp to valid grid range
         col = Math.max(0, Math.min(5, col));
         row = Math.max(0, Math.min(1, row));
-        
-        coordinates.setText(String.format("Grid: [%d,%d] | Preview: (%d,%d) | Widget: (%d,%d)", 
-            col, row, off[0], off[1], realX, realY));
+
+        String horizontalEdgeDesc = off[0] >= 0 ? String.format("left=%d", off[0]) : String.format("right=%d", -off[0]);
+        String verticalEdgeDesc = off[1] >= 0 ? String.format("top=%d", off[1]) : String.format("bottom=%d", -off[1]);
+
+        coordinates.setText(String.format("Grid[%d,%d] | Preview(%d,%d) | Widget(%d,%d) | %s | %s",
+            col, row, off[0], off[1], realX, realY, horizontalEdgeDesc, verticalEdgeDesc));
     }
 
     private void setupGeneralControls() {
