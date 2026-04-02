@@ -110,24 +110,8 @@ public class WidgetConfigureActivity extends Activity {
     }
 
     private void setPreviewContainerByProvider() {
-        if (previewContainer == null) return;
-
-        int previewDpWidth = Math.round(WIDGET_CELLS_WIDTH * PREVIEW_SCALE * CELL_DP); // 6-cell width
-        int previewDpHeight = Math.round(WIDGET_CELLS_HEIGHT * PREVIEW_SCALE * CELL_DP); // 2-cell height
-
-        ViewGroup.LayoutParams params = previewContainer.getLayoutParams();
-        if (params != null) {
-            params.width = dpToPx(previewDpWidth);
-            params.height = dpToPx(previewDpHeight);
-            previewContainer.setLayoutParams(params);
-        }
-
-        // Set margins to zero so preview matches exact workspace
-        ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) previewContainer.getLayoutParams();
-        if (marginParams != null) {
-            marginParams.setMargins(0, 0, 0, 0);
-            previewContainer.setLayoutParams(marginParams);
-        }
+        // Use XML-defined sizes (432dp x 144dp) without overriding to screen size
+        // This ensures consistent 6x2 preview across devices
     }
 
     private int dpToPx(int dp) {
@@ -249,7 +233,7 @@ public class WidgetConfigureActivity extends Activity {
             return new int[]{WidgetPreferences.constrainOffset(x), WidgetPreferences.constrainOffset(y)};
         }
 
-        int borderPx = (int) (2 * view.getResources().getDisplayMetrics().density);
+        int borderPx = 0; // Allow full workspace usage
         int halfW = containerW / 2;
         int halfH = containerH / 2;
 
