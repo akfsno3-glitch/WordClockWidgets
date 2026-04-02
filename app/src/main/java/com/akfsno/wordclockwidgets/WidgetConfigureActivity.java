@@ -296,18 +296,18 @@ public class WidgetConfigureActivity extends Activity {
         BaseWordClockWidgetProvider.updateLocalWidgetView(this, rootView, appWidgetId);
 
         // Apply current constructor offsets to wrappers (interactive drag)
-        applyMarginWithBounds("hour", hourWrapper);
-        applyMarginWithBounds("minute", minuteWrapper);
-        applyMarginWithBounds("dayNight", dayNightWrapper);
-        applyMarginWithBounds("date", dateWrapper);
-        applyMarginWithBounds("dayOfWeek", dayOfWeekWrapper);
+        applyTranslationWithBounds("hour", hourWrapper);
+        applyTranslationWithBounds("minute", minuteWrapper);
+        applyTranslationWithBounds("dayNight", dayNightWrapper);
+        applyTranslationWithBounds("date", dateWrapper);
+        applyTranslationWithBounds("dayOfWeek", dayOfWeekWrapper);
 
         updateCoordinates();
     }
 
-    private void applyMarginWithBounds(String block, View view) {
+    private void applyTranslationWithBounds(String block, View view) {
         if (view == null || previewContainer == null) {
-            Log.w("WidgetConfigureActivity", "applyMarginWithBounds: view or previewContainer is null for block " + block);
+            Log.w("WidgetConfigureActivity", "applyTranslationWithBounds: view or previewContainer is null for block " + block);
             return;
         }
 
@@ -318,18 +318,8 @@ public class WidgetConfigureActivity extends Activity {
         off[0] = bounded[0];
         off[1] = bounded[1];
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.gravity = Gravity.TOP | Gravity.START;
-
-        int centerX = (previewContainer.getWidth() - view.getWidth()) / 2;
-        int centerY = (previewContainer.getHeight() - view.getHeight()) / 2;
-
-        params.leftMargin = centerX + bounded[0];
-        params.topMargin = centerY + bounded[1];
-        view.setLayoutParams(params);
+        view.setTranslationX(bounded[0]);
+        view.setTranslationY(bounded[1]);
     }
 
     private int[] constrainOffsetToPreview(View view, int x, int y) {
