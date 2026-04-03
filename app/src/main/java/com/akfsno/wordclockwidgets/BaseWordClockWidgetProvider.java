@@ -41,6 +41,7 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
     public void onDisabled(Context context) {
         super.onDisabled(context);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) return;
         Intent intent = new Intent(context, this.getClass());
         intent.setAction(UPDATE_ACTION);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
@@ -91,7 +92,7 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
 
         setTexts(views, hourText, minuteText, dayNightText, dayOfWeekText, dateText);
 
-        // Apply offsets using margin simulation on wrapper elements
+        // Apply offsets using padding simulation on wrapper elements
         boolean useConstructorLayout = WidgetPreferences.getUseConstructorLayout(context, appWidgetId, false);
 
         int hourDx = 0;
@@ -118,11 +119,37 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
             dayOfWeekDy = WidgetPreferences.constrainOffset(WidgetPreferences.getDayOfWeekOffsetY(context, appWidgetId, 0));
         }
 
-        applyTranslationToWrapper(views, R.id.hour_wrapper, hourDx, hourDy);
-        applyTranslationToWrapper(views, R.id.minute_wrapper, minuteDx, minuteDy);
-        applyTranslationToWrapper(views, R.id.day_night_wrapper, dayNightDx, dayNightDy);
-        applyTranslationToWrapper(views, R.id.date_wrapper, dateDx, dateDy);
-        applyTranslationToWrapper(views, R.id.day_of_week_wrapper, dayOfWeekDx, dayOfWeekDy);
+        if (use12Hour) {
+            hourDx += 40;
+            hourDy += 40;
+        } else {
+            hourDy += 40;
+        }
+        minuteDy += 40;
+
+        if (!useConstructorLayout) {
+            dateDx = 0;
+            dateDy = 0;
+            dayOfWeekDx = 0;
+            dayOfWeekDy = 0;
+        }
+
+        hourDx = WidgetPreferences.constrainOffset(hourDx);
+        hourDy = WidgetPreferences.constrainOffset(hourDy);
+        minuteDx = WidgetPreferences.constrainOffset(minuteDx);
+        minuteDy = WidgetPreferences.constrainOffset(minuteDy);
+        dayNightDx = WidgetPreferences.constrainOffset(dayNightDx);
+        dayNightDy = WidgetPreferences.constrainOffset(dayNightDy);
+        dateDx = WidgetPreferences.constrainOffset(dateDx);
+        dateDy = WidgetPreferences.constrainOffset(dateDy);
+        dayOfWeekDx = WidgetPreferences.constrainOffset(dayOfWeekDx);
+        dayOfWeekDy = WidgetPreferences.constrainOffset(dayOfWeekDy);
+
+        applyPaddingToWrapper(views, R.id.hour_wrapper, hourDx, hourDy);
+        applyPaddingToWrapper(views, R.id.minute_wrapper, minuteDx, minuteDy);
+        applyPaddingToWrapper(views, R.id.day_night_wrapper, dayNightDx, dayNightDy);
+        applyPaddingToWrapper(views, R.id.date_wrapper, dateDx, dateDy);
+        applyPaddingToWrapper(views, R.id.day_of_week_wrapper, dayOfWeekDx, dayOfWeekDy);
 
         int hourColor = WidgetPreferences.getHourTextColor(context, appWidgetId, getDefaultTextColor());
         int minuteColor = WidgetPreferences.getMinuteTextColor(context, appWidgetId, getDefaultTextColor());
@@ -238,7 +265,8 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         int dayOfWeekDx = 0;
         int dayOfWeekDy = 0;
 
-        if (WidgetPreferences.getUseConstructorLayout(context, appWidgetId, false)) {
+        boolean useConstructorLayout = WidgetPreferences.getUseConstructorLayout(context, appWidgetId, false);
+        if (useConstructorLayout) {
             hourDx = WidgetPreferences.constrainOffset(WidgetPreferences.getOffsetX(context, appWidgetId, "hour", 0));
             hourDy = WidgetPreferences.constrainOffset(WidgetPreferences.getOffsetY(context, appWidgetId, "hour", 0));
             minuteDx = WidgetPreferences.constrainOffset(WidgetPreferences.getOffsetX(context, appWidgetId, "minute", 0));
@@ -250,6 +278,32 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
             dayOfWeekDx = WidgetPreferences.constrainOffset(WidgetPreferences.getDayOfWeekOffsetX(context, appWidgetId, 0));
             dayOfWeekDy = WidgetPreferences.constrainOffset(WidgetPreferences.getDayOfWeekOffsetY(context, appWidgetId, 0));
         }
+
+        if (use12Hour) {
+            hourDx += 40;
+            hourDy += 40;
+        } else {
+            hourDy += 40;
+        }
+        minuteDy += 40;
+
+        if (!useConstructorLayout) {
+            dateDx = 0;
+            dateDy = 0;
+            dayOfWeekDx = 0;
+            dayOfWeekDy = 0;
+        }
+
+        hourDx = WidgetPreferences.constrainOffset(hourDx);
+        hourDy = WidgetPreferences.constrainOffset(hourDy);
+        minuteDx = WidgetPreferences.constrainOffset(minuteDx);
+        minuteDy = WidgetPreferences.constrainOffset(minuteDy);
+        dayNightDx = WidgetPreferences.constrainOffset(dayNightDx);
+        dayNightDy = WidgetPreferences.constrainOffset(dayNightDy);
+        dateDx = WidgetPreferences.constrainOffset(dateDx);
+        dateDy = WidgetPreferences.constrainOffset(dateDy);
+        dayOfWeekDx = WidgetPreferences.constrainOffset(dayOfWeekDx);
+        dayOfWeekDy = WidgetPreferences.constrainOffset(dayOfWeekDy);
 
         applyLocalTranslation(rootView, R.id.hour_wrapper, hourDx, hourDy);
         applyLocalTranslation(rootView, R.id.minute_wrapper, minuteDx, minuteDy);
@@ -287,9 +341,17 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         }
     }
 
+    private void applyPaddingToWrapper(RemoteViews views, int wrapperViewId, int offsetX, int offsetY) {
+        int left = Math.max(0, offsetX);
+        int top = Math.max(0, offsetY);
+        int right = Math.max(0, -offsetX);
+        int bottom = Math.max(0, -offsetY);
+        views.setViewPadding(wrapperViewId, left, top, right, bottom);
+    }
+
     private void applyTranslationToWrapper(RemoteViews views, int wrapperViewId, int offsetX, int offsetY) {
-        views.setFloat(wrapperViewId, "setTranslationX", offsetX);
-        views.setFloat(wrapperViewId, "setTranslationY", offsetY);
+        // RemoteViews does not always support setTranslationX/Y; keep compatibility by using padding as baseline.
+        applyPaddingToWrapper(views, wrapperViewId, offsetX, offsetY);
     }
 
     private static void applyLocalTranslation(android.view.View rootView, int viewId, int offsetX, int offsetY) {

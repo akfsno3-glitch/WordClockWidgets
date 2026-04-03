@@ -63,7 +63,7 @@ public class ConstructorActivity extends Activity {
         if (previewDayOfWeek != null) previewDayOfWeek.setVisibility(showDayOfWeek ? View.VISIBLE : View.GONE);
 
         // Remove constructor-specific UI elements (block list and joystick)
-        View blockList = findViewById(R.id/block_list);
+        View blockList = findViewById(R.id.block_list);
         if (blockList != null) blockList.setVisibility(View.GONE);
 
         View joystickContainer = findViewById(R.id.joystick_container);

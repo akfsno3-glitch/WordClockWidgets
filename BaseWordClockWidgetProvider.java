@@ -234,31 +234,31 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         if (hourView != null) {
             hourView.setText(hourText);
             hourView.setTextSize(WidgetPreferences.getFontSize(context, appWidgetId, 24f));
-            hourView.setTextColor(WidgetPreferences.getHourTextColor(context, appWidgetId, getDefaultTextColor()));
+            hourView.setTextColor(WidgetPreferences.getHourTextColor(context, appWidgetId, android.graphics.Color.BLACK));
             hourView.setVisibility(showHour ? android.view.View.VISIBLE : android.view.View.GONE);
         }
         if (minuteView != null) {
             minuteView.setText(minuteText);
             minuteView.setTextSize(WidgetPreferences.getMinuteFontSize(context, appWidgetId, 24f));
-            minuteView.setTextColor(WidgetPreferences.getMinuteTextColor(context, appWidgetId, getDefaultTextColor()));
+            minuteView.setTextColor(WidgetPreferences.getMinuteTextColor(context, appWidgetId, android.graphics.Color.BLACK));
             minuteView.setVisibility(showMinute ? android.view.View.VISIBLE : android.view.View.GONE);
         }
         if (dayNightView != null) {
             dayNightView.setText(dayNightText);
             dayNightView.setTextSize(WidgetPreferences.getDayNightFontSize(context, appWidgetId, 18f));
-            dayNightView.setTextColor(WidgetPreferences.getDayNightTextColor(context, appWidgetId, getDefaultBorderColor()));
+            dayNightView.setTextColor(WidgetPreferences.getDayNightTextColor(context, appWidgetId, android.graphics.Color.RED));
             dayNightView.setVisibility(showDayNight ? android.view.View.VISIBLE : android.view.View.GONE);
         }
         if (dateView != null) {
             dateView.setText(dateText);
             dateView.setTextSize(WidgetPreferences.getDateFontSize(context, appWidgetId, 18f));
-            dateView.setTextColor(WidgetPreferences.getDateTextColor(context, appWidgetId, getDefaultTextColor()));
+            dateView.setTextColor(WidgetPreferences.getDateTextColor(context, appWidgetId, android.graphics.Color.BLACK));
             dateView.setVisibility(showDate ? android.view.View.VISIBLE : android.view.View.GONE);
         }
         if (dayOfWeekView != null) {
             dayOfWeekView.setText(dayOfWeekText);
             dayOfWeekView.setTextSize(WidgetPreferences.getDayOfWeekFontSize(context, appWidgetId, 18f));
-            dayOfWeekView.setTextColor(WidgetPreferences.getDayOfWeekTextColor(context, appWidgetId, getDefaultTextColor()));
+            dayOfWeekView.setTextColor(WidgetPreferences.getDayOfWeekTextColor(context, appWidgetId, android.graphics.Color.BLACK));
             dayOfWeekView.setVisibility(showDayOfWeek ? android.view.View.VISIBLE : android.view.View.GONE);
         }
 
@@ -331,7 +331,7 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         android.view.View borderView = rootView.findViewById(R.id.widget_border);
         if (borderView != null && borderView.getBackground() instanceof android.graphics.drawable.GradientDrawable) {
             android.graphics.drawable.GradientDrawable drawable = (android.graphics.drawable.GradientDrawable) borderView.getBackground().mutate();
-            int borderColor = WidgetPreferences.getBorderColor(context, appWidgetId, getDefaultBorderColor());
+            int borderColor = WidgetPreferences.getBorderColor(context, appWidgetId, 0xFF0000FF);
             int borderWidth = WidgetPreferences.getBorderWidth(context, appWidgetId, 2);
             drawable.setStroke(borderWidth, borderColor);
             borderView.setBackground(drawable);
