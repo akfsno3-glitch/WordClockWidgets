@@ -68,8 +68,8 @@ public class BasicStyleActivity extends Activity {
         WidgetPreferences.saveShowHour(this, appWidgetId, true);
         WidgetPreferences.saveShowMinute(this, appWidgetId, true);
         WidgetPreferences.saveShowDayNight(this, appWidgetId, true);
-        WidgetPreferences.saveShowDate(this, appWidgetId, false);
-        WidgetPreferences.saveShowDayOfWeek(this, appWidgetId, false);
+        WidgetPreferences.saveShowDate(this, appWidgetId, true);
+        WidgetPreferences.saveShowDayOfWeek(this, appWidgetId, true);
 
         Button saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(v -> saveAndFinish());
