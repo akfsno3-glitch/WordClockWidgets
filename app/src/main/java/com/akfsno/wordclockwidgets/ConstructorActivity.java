@@ -43,6 +43,11 @@ public class ConstructorActivity extends Activity {
             }
         }
 
+        // In constructor mode, show date and day-of-week by default
+        WidgetPreferences.saveShowDate(this, appWidgetId, true);
+        WidgetPreferences.saveShowDayOfWeek(this, appWidgetId, true);
+        WidgetPreferences.saveUseConstructorLayout(this, appWidgetId, true);
+
         // Initialize preview views (real widget layout)
         hourWrapper = findViewById(R.id.hour_wrapper);
         minuteWrapper = findViewById(R.id.minute_wrapper);
@@ -55,14 +60,6 @@ public class ConstructorActivity extends Activity {
         previewDayNight = findViewById(R.id.day_night_text);
         previewDate = findViewById(R.id.date_text);
         previewDayOfWeek = findViewById(R.id.day_of_week_text);
-
-        // In constructor mode, show/hide date and day-of-week wrappers according to preferences
-        boolean showDate = WidgetPreferences.getShowDate(this, appWidgetId, true);
-        boolean showDayOfWeek = WidgetPreferences.getShowDayOfWeek(this, appWidgetId, true);
-        if (dateWrapper != null) dateWrapper.setVisibility(showDate ? View.VISIBLE : View.GONE);
-        if (dayOfWeekWrapper != null) dayOfWeekWrapper.setVisibility(showDayOfWeek ? View.VISIBLE : View.GONE);
-        if (previewDate != null) previewDate.setVisibility(showDate ? View.VISIBLE : View.GONE);
-        if (previewDayOfWeek != null) previewDayOfWeek.setVisibility(showDayOfWeek ? View.VISIBLE : View.GONE);
 
         // Remove constructor-specific UI elements (block list and joystick)
         View blockList = findViewById(R.id.block_list);

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестер конструктора виджета Word Clock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .preview-container {
+            position: relative;
+            width: 420px;
+            height: 140px;
+            border: 2px solid #333;
+            margin: 20px auto;
+            background: #e0e0e0;
+            overflow: hidden;
+        }
+        .grid-line {
+            position: absolute;
+            background: rgba(255, 0, 0, 0.3);
+        }
+        .element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            line-height: 1;
+            transform: translate(-50%, -50%);
+        }
+        .element.hour { color: #000; }
+        .element.minute { color: #000; }
+        .element.dayNight { color: #d32f2f; }
+        .element.date { color: #000; font-size: 14px; }
+        .element.dayOfWeek { color: #000; font-size: 16px; }
+        .error-indicator {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: red;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .coordinates {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .joystick {
+            display: grid;
+            grid-template-columns: 1fr 48px 1fr;
+            grid-template-rows: 48px 48px 48px;
+            gap: 8px;
+            justify-items: center;
+            align-items: center;
+            margin: 20px auto;
+            width: 200px;
+        }
+        .joystick button {
+            width: 48px;
+            height: 48px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .joystick .empty { visibility: hidden; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тестер конструктора виджета Word Clock</h1>
+        <p>Перетаскивайте элементы для тестирования позиционирования. Красные точки показывают ошибки (элементы вне границ).</p>
+
+        <div class="preview-container" id="preview">
+            <!-- Grid lines will be added here -->
+            <!-- Elements will be added here -->
+        </div>
+
+        <div class="coordinates" id="coordinates">Grid[0,0] | Offset(0,0) | left=0 | top=0</div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Выбранный элемент:</label>
+                <select id="selectedElement">
+                    <option value="hour">Часы</option>
+                    <option value="minute">Минуты</option>
+                    <option value="dayNight">День/Ночь</option>
+                    <option value="date">Дата</option>
+                    <option value="dayOfWeek">День недели</option>
+                </select>
+            </div>
+            <button onclick="resetAll()">Сбросить всё</button>
+            <button onclick="savePositions()">Сохранить</button>
+        </div>
+
+        <div class="joystick">
+            <div class="empty"></div>
+            <button onclick="moveElement('up')">↑</button>
+            <div class="empty"></div>
+
+            <button onclick="moveElement('left')">←</button>
+            <div class="empty"></div>
+            <button onclick="moveElement('right')">→</button>
+
+            <div class="empty"></div>
+            <button onclick="moveElement('down')">↓</button>
+            <div class="empty"></div>
+        </div>
+    </div>
+
+    <script>
+        const PREVIEW_WIDTH = 420;
+        const PREVIEW_HEIGHT = 140;
+        const GRID_COLUMNS = 6;
+        const GRID_ROWS = 2;
+
+        let selectedElement = 'hour';
+        let elements = {
+            hour: { x: 0, y: 0, text: 'Четыре' },
+            minute: { x: 0, y: 0, text: 'Сорок три' },
+            dayNight: { x: 0, y: 0, text: 'дня' },
+            date: { x: 0, y: 0, text: '13 марта' },
+            dayOfWeek: { x: 0, y: 0, text: 'Понедельник' }
+        };
+
+        function init() {
+            createGrid();
+            createElements();
+            updateCoordinates();
+            document.getElementById('selectedElement').addEventListener('change', (e) => {
+                selectedElement = e.target.value;
+                updateCoordinates();
+            });
+        }
+
+        function createGrid() {
+            const container = document.getElementById('preview');
+
+            // Vertical lines
+            for (let x = 1; x < GRID_COLUMNS; x++) {
+                const line = document.createElement('div');
+                line.className = 'grid-line';
+                line.style.left = (x * PREVIEW_WIDTH / GRID_COLUMNS) + 'px';
+                line.style.top = '0px';
+                line.style.width = '1px';
+                line.style.height = PREVIEW_HEIGHT + 'px';
+                container.appendChild(line);
+            }
+
+            // Horizontal lines
+            for (let y = 1; y < GRID_ROWS; y++) {
+                const line = document.createElement('div');
+                line.className = 'grid-line';
+                line.style.left = '0px';
+                line.style.top = (y * PREVIEW_HEIGHT / GRID_ROWS) + 'px';
+                line.style.width = PREVIEW_WIDTH + 'px';
+                line.style.height = '1px';
+                container.appendChild(line);
+            }
+        }
+
+        function createElements() {
+            const container = document.getElementById('preview');
+
+            Object.keys(elements).forEach(key => {
+                const element = document.createElement('div');
+                element.className = `element ${key}`;
+                element.id = key;
+                element.textContent = elements[key].text;
+                element.style.left = (PREVIEW_WIDTH / 2 + elements[key].x) + 'px';
+                element.style.top = (PREVIEW_HEIGHT / 2 + elements[key].y) + 'px';
+
+                // Make draggable
+                element.addEventListener('mousedown', startDrag);
+                element.addEventListener('click', () => {
+                    selectedElement = key;
+                    document.getElementById('selectedElement').value = key;
+                    updateCoordinates();
+                });
+
+                container.appendChild(element);
+            });
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            const element = e.target;
+            const elementKey = element.id;
+            selectedElement = elementKey;
+            document.getElementById('selectedElement').value = elementKey;
+
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const startLeft = parseInt(element.style.left);
+            const startTop = parseInt(element.style.top);
+
+            function drag(e) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+
+                elements[elementKey].x = startLeft + dx - PREVIEW_WIDTH / 2;
+                elements[elementKey].y = startTop + dy - PREVIEW_HEIGHT / 2;
+
+                updateElementPosition(elementKey);
+                updateCoordinates();
+                updateErrorIndicators();
+            }
+
+            function stopDrag() {
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('mouseup', stopDrag);
+            }
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function updateElementPosition(key) {
+            const element = document.getElementById(key);
+            element.style.left = (PREVIEW_WIDTH / 2 + elements[key].x) + 'px';
+            element.style.top = (PREVIEW_HEIGHT / 2 + elements[key].y) + 'px';
+        }
+
+        function updateCoordinates() {
+            const off = elements[selectedElement];
+            const displayX = Math.round(off.x);
+            const displayY = Math.round(off.y);
+
+            const cellWidth = PREVIEW_WIDTH / GRID_COLUMNS;
+            const cellHeight = PREVIEW_HEIGHT / GRID_ROWS;
+            const xForGrid = off.x >= 0 ? off.x : PREVIEW_WIDTH + off.x;
+            const yForGrid = off.y >= 0 ? off.y : PREVIEW_HEIGHT + off.y;
+            const col = Math.max(0, Math.min(GRID_COLUMNS - 1, Math.floor(xForGrid / cellWidth)));
+            const row = Math.max(0, Math.min(GRID_ROWS - 1, Math.floor(yForGrid / cellHeight)));
+
+            const horizontalEdgeDesc = off.x >= 0 ? `left=${displayX}` : `right=${-displayX}`;
+            const verticalEdgeDesc = off.y >= 0 ? `top=${displayY}` : `bottom=${-displayY}`;
+
+            const isOutOfBounds = Math.abs(off.x) > PREVIEW_WIDTH / 2 || Math.abs(off.y) > PREVIEW_HEIGHT / 2;
+            const errorText = isOutOfBounds ? ' ⚠️ ВНЕ ГРАНИЦ!' : '';
+
+            document.getElementById('coordinates').innerHTML =
+                `Grid[${col},${row}] | Offset(${displayX},${displayY}) | ${horizontalEdgeDesc} | ${verticalEdgeDesc}${errorText}`;
+        }
+
+        function updateErrorIndicators() {
+            // Remove existing error indicators
+            document.querySelectorAll('.error-indicator').forEach(el => el.remove());
+
+            Object.keys(elements).forEach(key => {
+                const pos = elements[key];
+                const isOutOfBounds = Math.abs(pos.x) > PREVIEW_WIDTH / 2 || Math.abs(pos.y) > PREVIEW_HEIGHT / 2;
+
+                if (isOutOfBounds) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'error-indicator';
+                    indicator.style.left = Math.max(0, Math.min(PREVIEW_WIDTH - 10, PREVIEW_WIDTH / 2 + pos.x - 5)) + 'px';
+                    indicator.style.top = Math.max(0, Math.min(PREVIEW_HEIGHT - 10, PREVIEW_HEIGHT / 2 + pos.y - 5)) + 'px';
+                    document.getElementById('preview').appendChild(indicator);
+                }
+            });
+        }
+
+        function moveElement(direction) {
+            const step = 10;
+            const element = elements[selectedElement];
+
+            switch (direction) {
+                case 'up': element.y -= step; break;
+                case 'down': element.y += step; break;
+                case 'left': element.x -= step; break;
+                case 'right': element.x += step; break;
+            }
+
+            updateElementPosition(selectedElement);
+            updateCoordinates();
+            updateErrorIndicators();
+        }
+
+        function resetAll() {
+            Object.keys(elements).forEach(key => {
+                elements[key].x = 0;
+                elements[key].y = 0;
+                updateElementPosition(key);
+            });
+            updateCoordinates();
+            updateErrorIndicators();
+        }
+
+        function savePositions() {
+            const data = JSON.stringify(elements, null, 2);
+            console.log('Сохраненные позиции:', data);
+            alert('Позиции сохранены в консоли браузера (F12)');
+        }
+
+        // Initialize when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>

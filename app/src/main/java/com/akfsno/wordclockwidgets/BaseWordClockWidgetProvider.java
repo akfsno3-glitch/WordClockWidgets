@@ -119,21 +119,6 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
             dayOfWeekDy = WidgetPreferences.constrainOffset(WidgetPreferences.getDayOfWeekOffsetY(context, appWidgetId, 0));
         }
 
-        if (use12Hour) {
-            hourDx += 40;
-            hourDy += 40;
-        } else {
-            hourDy += 40;
-        }
-        minuteDy += 40;
-
-        if (!useConstructorLayout) {
-            dateDx = 0;
-            dateDy = 0;
-            dayOfWeekDx = 0;
-            dayOfWeekDy = 0;
-        }
-
         hourDx = WidgetPreferences.constrainOffset(hourDx);
         hourDy = WidgetPreferences.constrainOffset(hourDy);
         minuteDx = WidgetPreferences.constrainOffset(minuteDx);
@@ -277,21 +262,6 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
             dateDy = WidgetPreferences.constrainOffset(WidgetPreferences.getDateOffsetY(context, appWidgetId, 0));
             dayOfWeekDx = WidgetPreferences.constrainOffset(WidgetPreferences.getDayOfWeekOffsetX(context, appWidgetId, 0));
             dayOfWeekDy = WidgetPreferences.constrainOffset(WidgetPreferences.getDayOfWeekOffsetY(context, appWidgetId, 0));
-        }
-
-        if (use12Hour) {
-            hourDx += 40;
-            hourDy += 40;
-        } else {
-            hourDy += 40;
-        }
-        minuteDy += 40;
-
-        if (!useConstructorLayout) {
-            dateDx = 0;
-            dateDy = 0;
-            dayOfWeekDx = 0;
-            dayOfWeekDy = 0;
         }
 
         hourDx = WidgetPreferences.constrainOffset(hourDx);

@@ -173,11 +173,11 @@ public class WidgetConfigureActivity extends Activity {
         if (!(previewContainer instanceof FrameLayout)) return;
 
         FrameLayout container = (FrameLayout) previewContainer;
-        // Remove existing grid lines
+        // Remove existing grid lines and error indicators
         for (int i = container.getChildCount() - 1; i >= 0; i--) {
             View child = container.getChildAt(i);
             Object tag = child.getTag();
-            if (tag != null && "grid_line".equals(tag)) {
+            if (tag != null && ("grid_line".equals(tag) || tag.toString().startsWith("error_indicator"))) {
                 container.removeViewAt(i);
             }
         }
@@ -213,6 +213,36 @@ public class WidgetConfigureActivity extends Activity {
             lp.topMargin = y * cellHeight;
             line.setLayoutParams(lp);
             container.addView(line);
+        }
+
+        // Add error indicators for elements outside bounds
+        addErrorIndicators(container);
+    }
+
+    private void addErrorIndicators(FrameLayout container) {
+        // Check each element position and add red indicators if outside bounds
+        String[] elements = {"hour", "minute", "dayNight", "date", "dayOfWeek"};
+
+        for (String element : elements) {
+            int[] pos = blockOffsets.get(element);
+            if (pos != null) {
+                boolean isOutOfBounds = Math.abs(pos[0]) > previewPixelWidth / 2 || Math.abs(pos[1]) > previewPixelHeight / 2;
+
+                if (isOutOfBounds) {
+                    // Add red error indicator
+                    View errorIndicator = new View(this);
+                    errorIndicator.setBackgroundColor(0xFFFF0000);
+                    errorIndicator.setTag("error_indicator_" + element);
+                    FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                            dpToPx(10),
+                            dpToPx(10)
+                    );
+                    lp.leftMargin = Math.max(0, Math.min(previewPixelWidth - dpToPx(10), previewPixelWidth / 2 + pos[0] - dpToPx(5)));
+                    lp.topMargin = Math.max(0, Math.min(previewPixelHeight - dpToPx(10), previewPixelHeight / 2 + pos[1] - dpToPx(5)));
+                    errorIndicator.setLayoutParams(lp);
+                    container.addView(errorIndicator);
+                }
+            }
         }
     }
 
@@ -301,6 +331,11 @@ public class WidgetConfigureActivity extends Activity {
         applyTranslationWithBounds("dayNight", dayNightWrapper);
         applyTranslationWithBounds("date", dateWrapper);
         applyTranslationWithBounds("dayOfWeek", dayOfWeekWrapper);
+
+        // Update error indicators after applying translations
+        if (previewContainer instanceof FrameLayout) {
+            addErrorIndicators((FrameLayout) previewContainer);
+        }
 
         updateCoordinates();
     }
@@ -474,11 +509,11 @@ public class WidgetConfigureActivity extends Activity {
 
     private void updateCoordinates() {
         int[] off = blockOffsets.get(selectedBlock);
-        
+
         // Coordinates are stored in pixel units and displayed as-is
         int displayX = off[0];
         int displayY = off[1];
-        
+
         // Calculate grid cell (6 columns x 2 rows) from edge-based coordinates
         float cellWidth = previewPixelWidth / 6f;
         float cellHeight = previewPixelHeight / 2f;
@@ -494,8 +529,12 @@ public class WidgetConfigureActivity extends Activity {
         String horizontalEdgeDesc = off[0] >= 0 ? String.format("left=%d", off[0]) : String.format("right=%d", -off[0]);
         String verticalEdgeDesc = off[1] >= 0 ? String.format("top=%d", off[1]) : String.format("bottom=%d", -off[1]);
 
-        coordinates.setText(String.format("Grid[%d,%d] | Offset(%d,%d) | %s | %s",
-            col, row, displayX, displayY, horizontalEdgeDesc, verticalEdgeDesc));
+        // Check for errors
+        boolean isOutOfBounds = Math.abs(off[0]) > previewPixelWidth / 2 || Math.abs(off[1]) > previewPixelHeight / 2;
+        String errorText = isOutOfBounds ? " ⚠️ ВНЕ ГРАНИЦ!" : "";
+
+        coordinates.setText(String.format("Grid[%d,%d] | Offset(%d,%d) | %s | %s%s",
+            col, row, displayX, displayY, horizontalEdgeDesc, verticalEdgeDesc, errorText));
     }
 
     private void setupGeneralControls() {
