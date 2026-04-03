@@ -8,15 +8,15 @@
 
     <FrameLayout
         android:id="@+id/widget_border"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:background="@drawable/widget_border">
 
         <!-- Transparent content container for positioning -->
         <FrameLayout
             android:layout_width="300dp"
             android:layout_height="100dp"
-            android:padding="2dp">
+            android:padding="2dp"
             android:layout_gravity="center">
 
             <!-- Hour text wrapper for independent positioning -->
