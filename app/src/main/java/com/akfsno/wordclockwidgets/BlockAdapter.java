@@ -320,8 +320,8 @@ public class BlockAdapter extends BaseExpandableListAdapter {
                 boolean current = blockKey.equals("hour") ? WidgetPreferences.getShowHour(context, appWidgetId, true)
                         : blockKey.equals("minute") ? WidgetPreferences.getShowMinute(context, appWidgetId, true)
                         : blockKey.equals("dayNight") ? WidgetPreferences.getShowDayNight(context, appWidgetId, true)
-                        : blockKey.equals("date") ? WidgetPreferences.getShowDate(context, appWidgetId, false)
-                        : WidgetPreferences.getShowDayOfWeek(context, appWidgetId, false);
+                        : blockKey.equals("date") ? WidgetPreferences.getShowDate(context, appWidgetId, true)
+                        : WidgetPreferences.getShowDayOfWeek(context, appWidgetId, true);
                 boolean newValue = !current;
                 switch (blockKey) {
                     case "hour": WidgetPreferences.saveShowHour(context, appWidgetId, newValue); break;

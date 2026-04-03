@@ -89,6 +89,7 @@ public class WidgetConfigureActivity extends Activity {
         setPreviewContainerByProvider();
         setupBlockList();
         loadOffsets();
+        updatePreview(); // Update preview visibility after loading offsets
         // Delay updatePreview until view is laid out and getWidth/getHeight work properly
         if (previewContainer != null) {
             previewContainer.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
@@ -655,6 +656,7 @@ public class WidgetConfigureActivity extends Activity {
     }
 
     private void updateWidget() {
+        updatePreview();
         Intent intent = new Intent();
         try {
             intent.setComponent(new android.content.ComponentName(this, widgetProviderClass));
@@ -681,8 +683,8 @@ public class WidgetConfigureActivity extends Activity {
         WidgetPreferences.saveShowHour(this, appWidgetId, true);
         WidgetPreferences.saveShowMinute(this, appWidgetId, true);
         WidgetPreferences.saveShowDayNight(this, appWidgetId, true);
-        WidgetPreferences.saveShowDate(this, appWidgetId, false);
-        WidgetPreferences.saveShowDayOfWeek(this, appWidgetId, false);
+        WidgetPreferences.saveShowDate(this, appWidgetId, true);
+        WidgetPreferences.saveShowDayOfWeek(this, appWidgetId, true);
         // reset colors
         WidgetPreferences.saveHourTextColor(this, appWidgetId, getResources().getColor(android.R.color.black));
         WidgetPreferences.saveMinuteTextColor(this, appWidgetId, getResources().getColor(android.R.color.black));
