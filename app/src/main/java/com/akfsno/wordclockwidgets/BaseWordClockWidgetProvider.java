@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.text.SpannableString;
 import android.text.style.AbsoluteSizeSpan;
 import android.widget.RemoteViews;
+import java.lang.reflect.Method;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -221,27 +222,30 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         android.widget.TextView dateView = rootView.findViewById(R.id.date_text);
         android.widget.TextView dayOfWeekView = rootView.findViewById(R.id.day_of_week_text);
 
+        // Get preview font scale (should be ~1.0 if sizes are equal in dp)
+        float previewFontScale = getPreviewFontScale(context);
+
         if (hourView != null) {
             hourView.setText(hourText);
-            hourView.setTextSize(WidgetPreferences.getFontSize(context, appWidgetId, 24f));
+            hourView.setTextSize(WidgetPreferences.getFontSize(context, appWidgetId, 24f) * previewFontScale);
             hourView.setTextColor(WidgetPreferences.getHourTextColor(context, appWidgetId, android.graphics.Color.BLACK));
             hourView.setVisibility(showHour ? android.view.View.VISIBLE : android.view.View.GONE);
         }
         if (minuteView != null) {
             minuteView.setText(minuteText);
-            minuteView.setTextSize(WidgetPreferences.getMinuteFontSize(context, appWidgetId, 24f));
+            minuteView.setTextSize(WidgetPreferences.getMinuteFontSize(context, appWidgetId, 24f) * previewFontScale);
             minuteView.setTextColor(WidgetPreferences.getMinuteTextColor(context, appWidgetId, android.graphics.Color.BLACK));
             minuteView.setVisibility(showMinute ? android.view.View.VISIBLE : android.view.View.GONE);
         }
         if (dayNightView != null) {
             dayNightView.setText(dayNightText);
-            dayNightView.setTextSize(WidgetPreferences.getDayNightFontSize(context, appWidgetId, 18f));
+            dayNightView.setTextSize(WidgetPreferences.getDayNightFontSize(context, appWidgetId, 18f) * previewFontScale);
             dayNightView.setTextColor(WidgetPreferences.getDayNightTextColor(context, appWidgetId, android.graphics.Color.RED));
             dayNightView.setVisibility(showDayNight ? android.view.View.VISIBLE : android.view.View.GONE);
         }
         if (dateView != null) {
             dateView.setText(dateText);
-            dateView.setTextSize(WidgetPreferences.getDateFontSize(context, appWidgetId, 18f));
+            dateView.setTextSize(WidgetPreferences.getDateFontSize(context, appWidgetId, 18f) * previewFontScale);
             dateView.setTextColor(WidgetPreferences.getDateTextColor(context, appWidgetId, android.graphics.Color.BLACK));
             dateView.setVisibility(showDate ? android.view.View.VISIBLE : android.view.View.GONE);
         }
@@ -252,7 +256,7 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         
         if (dayOfWeekView != null) {
             dayOfWeekView.setText(dayOfWeekText);
-            dayOfWeekView.setTextSize(WidgetPreferences.getDayOfWeekFontSize(context, appWidgetId, 18f));
+            dayOfWeekView.setTextSize(WidgetPreferences.getDayOfWeekFontSize(context, appWidgetId, 18f) * previewFontScale);
             dayOfWeekView.setTextColor(WidgetPreferences.getDayOfWeekTextColor(context, appWidgetId, android.graphics.Color.BLACK));
             dayOfWeekView.setVisibility(showDayOfWeek ? android.view.View.VISIBLE : android.view.View.GONE);
         }
@@ -351,6 +355,17 @@ public abstract class BaseWordClockWidgetProvider extends AppWidgetProvider {
         SpannableString spannable = new SpannableString(text);
         spannable.setSpan(new AbsoluteSizeSpan((int) size, true), 0, text.length(), 0);
         views.setTextViewText(viewId, spannable);
+    }
+
+    protected static float getPreviewFontScale(Context context) {
+        try {
+            Class<?> configActivity = Class.forName("com.akfsno.wordclockwidgets.WidgetConfigureActivity");
+            java.lang.reflect.Method method = configActivity.getMethod("getPreviewFontScale", Context.class);
+            Object result = method.invoke(null, context);
+            return result instanceof Float ? (Float) result : 1.0f;
+        } catch (Exception e) {
+            return 1.0f;
+        }
     }
 
     private static void applyLocalTranslation(android.view.View rootView, int viewId, int offsetX, int offsetY) {
