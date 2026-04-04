@@ -26,10 +26,10 @@ import java.util.Map;
 
 public class WidgetConfigureActivity extends Activity {
 
-    private static final int REAL_WIDGET_DP_WIDTH = 420;
-    private static final int REAL_WIDGET_DP_HEIGHT = 150;
-    private static final int CONSTRUCTOR_PREVIEW_DP_WIDTH = 420;
-    private static final int CONSTRUCTOR_PREVIEW_DP_HEIGHT = 150;
+    private static final int REAL_WIDGET_DP_WIDTH = 370;
+    private static final int REAL_WIDGET_DP_HEIGHT = 180;
+    private static final int CONSTRUCTOR_PREVIEW_DP_WIDTH = 370;
+    private static final int CONSTRUCTOR_PREVIEW_DP_HEIGHT = 180;
 
     private static final int GRID_COLUMNS = 6;
     private static final int GRID_ROWS = 2;
