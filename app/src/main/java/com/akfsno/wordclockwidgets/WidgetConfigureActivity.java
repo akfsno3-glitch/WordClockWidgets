@@ -42,7 +42,7 @@ public class WidgetConfigureActivity extends Activity {
         float previewArea = (float) previewPxWidth * previewPxHeight;
         float realArea = (float) realPxWidth * realPxHeight;
         if (realArea <= 0f) return 1f;
-        return (float) Math.sqrt(previewArea / realArea);
+        return (float) Math.sqrt(2 * previewArea / realArea);
     }
 
     private static final int GRID_COLUMNS = 6;
